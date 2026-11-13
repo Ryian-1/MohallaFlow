@@ -1,84 +1,98 @@
-# MohallaFlow — Publication Readiness Checklist
+# MohallaFlow — Public Snapshot and Release Checklist
 
-**Review date:** 13 November 2026
-**Status:** Curated publication candidate; **not yet approved for public release**.
+**Review date:** 13 November 2026  
+**Publication status:** Public code-showcase snapshot published; **not production-ready**.
 
-This checklist records evidence available from the local remediation work and separates verified local results from outstanding production, legal and publication gates. A passing emulator test is not production approval. A successful unsigned iOS build is not App Store distribution readiness.
+This document distinguishes the published source snapshot, locally completed engineering evidence, public CI, and the separate requirements for a production colony deployment. Emulator test success is not production approval. An unsigned iOS build is not App Store distribution readiness.
 
-## 1. Verified local engineering evidence
+## 1. Published GitHub snapshot
 
-- [x] Curated publication manifest: 227 unique entries, zero missing files and zero duplicate entries.
-- [x] Excluded Local Services Directory screen is absent from the curated snapshot; no Dart imports or class references to that screen were found in the snapshot's `lib/` sources.
-- [x] Developer-specific Firebase configuration files are excluded from the curated snapshot: `google-services.json`, `GoogleService-Info.plist`, generated `lib/firebase_options.dart`, local `firebase.json`, `.firebaserc` and root `firestore.rules`.
-- [x] Gitleaks directory scan of the exact 227-file publication snapshot: zero findings.
-- [x] Gitleaks scan of the local remediation Git history: zero findings across three local commits.
-- [x] Flutter unit/widget tests: 40 passed using `flutter test --no-pub`.
-- [x] Flutter static analysis: no issues found.
+- [x] Public repository: https://github.com/Ryian-1/MohallaFlow
+- [x] Default branch: `main`.
+- [x] Published root commit: `1f67be9ba9541a48583ed90d8b3ca2964fd858ee` (initial publication snapshot; subsequent documentation/CI commits follow it).
+- [x] Initial publication commit is an independent root commit with zero parents; previous private Git history was not pushed.
+- [x] 503 tracked files were published in the initial snapshot.
+- [x] Exact staged publication snapshot was scanned with Gitleaks: approximately 5.47 MB scanned, no leaks found.
+- [x] Remote Git tree was checked after push; no `.rules` files or matching Firebase credential/configuration files were present.
+- [x] Firebase/Firestore/Storage security rules, runtime Firebase configuration, credentials, environment secrets and signing keys were excluded. Clearly labelled example templates remain.
+- [x] No Firebase production deployment was performed or authorized.
+
+## 2. Verified local engineering evidence
+
+- [x] Excluded Local Services Directory screen is absent from the published application sources.
+- [x] Flutter unit/widget tests: 40 passed in the recorded local validation run.
+- [x] Flutter static analysis: no issues found in the recorded local validation run.
 - [x] Dart formatting check: 74 files checked, zero files changed.
-- [x] Firestore targeted QA: 22 authorization scenarios and 10 attendance scenarios passed.
-- [x] Firestore extended Emulator suite: 152 tests passed.
+- [x] Firestore targeted QA: 22 authorization scenarios and 10 attendance scenarios passed against the private Candidate G QA rules.
+- [x] Firestore extended Emulator suite: 152 tests passed against the private Candidate G QA rules.
 - [x] Functions lint passed.
 - [x] Functions resident-registration tests: 5 passed.
 - [x] Functions App Check tests: 1 passed.
 - [x] Worker-private migration unit tests: 5 passed.
-- [x] Functions Emulator QA: previously completed successfully with 13 emulator tests and the payroll callable integration. A later consolidated rerun was blocked because port 8080 was occupied; the runner correctly stopped without terminating the existing process.
-- [x] Four-role application integration: previously passed 1/1 on the iPhone 18 Pro simulator, covering Admin, Resident, Cleanliness Manager and Worker dashboards. A later consolidated rerun was blocked because port 8080 was occupied.
+- [x] Functions Emulator QA previously completed successfully with 13 emulator tests and the payroll callable integration in an isolated demo project.
+- [x] Four-role application integration previously passed 1/1 on the iPhone 18 Pro simulator, covering Admin, Resident, Cleanliness Manager and Worker dashboards.
 - [x] Android release APK compiled successfully; recorded output approximately 69.7 MB.
 - [x] iOS device Release app compiled successfully with code signing disabled; recorded output approximately 57.6 MB.
-- [x] iOS AppIcon catalog: 19 entries, zero missing referenced images; 1024x1024 marketing icon SHA-256 matches the master branding icon.
-- [x] Branding asset bundle verified to contain only `logo_horizontal.png` and `monogram.png`; the source `.bak` file remains preserved and is not bundled.
-- [x] Updated README installed into the temporary publication snapshot; nine internal links validated with zero broken links.
-- [x] `git diff --check` passed during the local preflight.
+- [x] iOS AppIcon catalog: 19 entries, zero missing referenced images; 1024x1024 marketing icon matches the master branding icon.
+- [x] Third-party dependency licence inventories generated for Flutter/Dart, Node, iOS Swift Package Manager and Android Gradle. Provenance caveats remain documented in `THIRD_PARTY_NOTICES.md`.
 
-## 2. Checks that need a fresh run or were inconclusive
+These are recorded local results from the remediation workspace. They are not a claim that every suite has been rerun from a clean public clone or against production Firebase.
 
-- [ ] Rerun online npm audit when registry connectivity is available. An earlier Functions audit reported zero vulnerabilities, but the latest run failed to reach `registry.npmjs.org`.
-- [ ] Rerun OSV lockfile scan when `api.osv.dev` is reachable. An earlier scan reported no findings across the three scanned lockfiles; the latest run could not reach the OSV API and is not a fresh security pass.
-- [ ] Rerun Flutter tests only if source changes after the recorded 40/40 pass.
-- [ ] Rerun Functions Emulator and four-role integration if required after source changes, using a verified free-port environment. Do not terminate existing processes automatically.
-- [ ] Execute the Flutter payroll SDK integration test on a simulator/device against its dedicated local emulator fixture. The Functions-side callable integration passed; this separate Flutter SDK integration test has not yet been evidenced as executed.
+## 3. Public GitHub Actions
+
+The first workflow run on the publication commit exposed an incorrect CI boundary:
+
+- [x] Flutter formatting, static analysis and unit/widget tests passed on GitHub Actions.
+- [x] Cloud Functions lint and Node.js unit tests passed on GitHub Actions.
+- [x] The original Functions job failed only at its subsequent Emulator step because its runner requires the deliberately excluded private Candidate G rules file.
+- [x] The original Firestore job failed because the private Candidate G rules file is deliberately absent from the public repository.
+- [x] Public CI workflow corrected to run only checks that can execute from the public snapshot without private security rules or production Firebase configuration.
+- [ ] Confirm the new GitHub Actions run is green after this workflow correction.
+
+The public workflow covers Flutter format, analysis and unit/widget tests, plus Cloud Functions lint and unit tests. Firestore and Functions Emulator suites that depend on private Candidate G are maintainer-only checks and are not run by public CI. Do not add private rules to the public repository to make those jobs pass.
+
+[View GitHub Actions](https://github.com/Ryian-1/MohallaFlow/actions)
+
+## 4. Checks still requiring fresh evidence
+
+- [ ] Rerun online `npm audit` when registry connectivity is available.
+- [ ] Rerun OSV lockfile scanning when `api.osv.dev` is reachable.
+- [ ] Execute the Flutter payroll SDK integration test on a simulator/device against its dedicated local Emulator fixture.
 - [ ] Validate a clean clone and documented setup from a separate environment.
-- [ ] Review CI workflow syntax and confirm all intended files are included in formatting checks; then observe actual GitHub Actions results on the publication branch/PR.
+- [ ] Re-run relevant functional suites after any application-source changes.
 
-## 3. Production and deployment blockers — keep unchecked
+A prior online Functions audit reported zero vulnerabilities, but a later run could not reach the npm registry. A prior OSV scan reported no findings, but the latest attempt could not reach the OSV API. Neither is a fresh advisory pass.
 
-- [ ] Restructure, independently review and approve the production Firestore rules. The maintainer-local root rules snapshot was previously measured at 384,997 bytes, above Firebase's documented 256 KiB source limit, and is intentionally excluded.
-- [ ] Candidate G (`qa_candidates/firestore_candidate_g.rules`, SHA-256 `7f30e3bdd6b6e244e66c33baaa32a6ee3ef04beb6799bc377f87f29bac8a2ab0`) is emulator-validated only. It is not approved for production deployment.
+## 5. Production and deployment blockers — keep unchecked
+
+- [ ] Restructure, independently review and approve the production Firestore rules. The maintainer-local root rules snapshot was previously measured at 384,997 bytes, above Firebase's documented 256 KiB source limit, and remains excluded.
+- [ ] Candidate G was validated in an Emulator environment only. It is not approved for production deployment and is not included in this public repository.
 - [ ] Complete a fresh independent Firebase project setup and acceptance test.
 - [ ] Verify production App Check enforcement and Android Play Integrity / Apple App Attest configuration in the intended Firebase projects.
 - [ ] Review Firebase API-key restrictions, IAM, Functions authorization, quotas and environment separation.
-- [ ] Complete live push notification and APNs delivery verification if push is enabled for the release.
 - [ ] Confirm production data handling, backup/restore, privacy disclosures, retention, access controls and incident response.
-- [ ] Do not deploy Firebase rules or Functions as part of GitHub publication. Production deployment requires a separate explicit authorization.
+- [ ] Verify real authentication and critical workflows using synthetic test data in the independent environment.
+- [ ] Complete live push notification and APNs delivery verification only if push notifications are enabled for the release.
+- [ ] Prepare signed Android and iOS distribution builds and complete device acceptance testing.
+- [ ] Do not deploy Firebase rules or Functions as part of GitHub publication. Production deployment requires separate explicit authorization.
 
-## 4. Legal, assets and public repository readiness — keep unchecked until evidenced
+## 6. Legal, assets and product presentation
 
 - [ ] Confirm first-party code ownership and rights for every contribution, generated/copied template and commissioned component.
 - [ ] Confirm rights to logos, fonts, icons, screenshots and other visual assets.
-- [x] Generate documented third-party dependency licence inventories for Flutter/Dart, Node, iOS Swift Package Manager and Android Gradle. See `THIRD_PARTY_NOTICES.md`; four Flutter engine artifacts and two reconstructed Node MIT notices retain explicit source-provenance caveats.
+- [x] Generate documented third-party dependency licence inventories. Four Flutter engine artifacts and two reconstructed Node MIT notices retain explicit source-provenance caveats; the inventory is not legal clearance.
 - [ ] Decide whether the repository remains unlicensed / all rights reserved or receives an explicitly approved open-source licence. Do not add a licence until ownership and redistribution rights are confirmed.
-- [ ] Capture genuine, sanitised screenshots from the current application using synthetic demo data for all four roles and key workflows. Do not label mockups as real application screenshots.
+- [ ] Capture genuine, sanitised screenshots from the current application using synthetic demo data for all four roles and key workflows.
 - [ ] Complete README, architecture, data-model, Firebase setup, security and troubleshooting review.
 - [ ] Prepare release notes and select a version only after the included snapshot is frozen.
-- [ ] Confirm a clean publication history and perform secret scanning on the exact release tree and its new history.
-- [ ] Verify GitHub Actions on the publication commit/PR.
-- [ ] Obtain explicit approval before pushing, changing repository visibility, creating tags/releases or publishing the LinkedIn announcement.
+- [ ] Decide whether to make a separate public release announcement after the review gates are cleared.
 
-## 5. GitHub history and publication strategy
+No open-source licence is currently granted in this repository. Public visibility is not a licence to reuse, modify, redistribute or commercially deploy the original project code or brand assets.
 
-The existing GitHub repository is separate from the local remediation repository. The remote repository's `main` history contains five commits and historically tracked Firebase client configuration files. Those files are currently excluded from the curated snapshot, and the local three-commit remediation history passed Gitleaks. This does not make the remote history equivalent to the clean snapshot.
+## 7. Release decision
 
-Recommended publication approach:
+**Current decision: PUBLIC CODE SHOWCASE PUBLISHED; NOT READY FOR PRODUCTION DEPLOYMENT OR STORE RELEASE.**
 
-1. Preserve the existing private repository and its history.
-2. Publish the reviewed 227-file curated snapshot with a fresh Git history, after the final snapshot review and owner approval.
-3. Keep developer Firebase configuration, local aliases, the excluded Local Services Directory and generated artifacts out of the public tree.
-4. Verify the resulting remote tree, default branch, README, licence notice, CI run and secret scan before changing repository visibility or announcing the project.
+The repository is public and the initial snapshot has an independent clean history. Secret scanning and the initial remote-tree exclusion check passed. The public CI has been adjusted to avoid private-rule dependencies; its new run must pass before the public engineering baseline is considered green.
 
-## 6. Release decision
-
-**Current decision: NOT READY for a production deployment or an unconditional public release.**
-
-The curated source snapshot has passed its file-count, README-link and Gitleaks checks. Local functional, emulator and build evidence is substantial. Production Firestore approval, independent Firebase acceptance, distribution signing, legal/ownership approval, authentic screenshots, current online dependency scans and actual GitHub Actions execution remain open gates.
-
-Public code showcase publication may be considered separately from production deployment, but only after the owner approves the legal/asset position, the clean-history repository plan and the exact final tree.
+Production Firestore approval, independent Firebase acceptance, distribution signing, legal/ownership approval, authentic screenshots and fresh online dependency scans remain open gates.
