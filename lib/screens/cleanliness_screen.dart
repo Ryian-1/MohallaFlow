@@ -1299,14 +1299,12 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
                             !isComplaintLinkedTask ||
                             statusOption != 'completed',
                       )
-                      .map(
-                        (statusOption) {
-                          return PopupMenuItem<String>(
-                            value: statusOption,
-                            child: AppText(_statusLabel(statusOption)),
-                          );
-                        },
-                      )
+                      .map((statusOption) {
+                        return PopupMenuItem<String>(
+                          value: statusOption,
+                          child: AppText(_statusLabel(statusOption)),
+                        );
+                      })
                       .toList();
                 },
                 icon: const Icon(
