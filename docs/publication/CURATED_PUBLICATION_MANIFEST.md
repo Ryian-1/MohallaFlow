@@ -29,7 +29,7 @@ Clearly labelled example templates such as `.firebaserc.example`, `firebase.json
 
 - The initial publication commit is a root commit with zero parents. The previous private Git history was not included in the public push.
 - Gitleaks scanned the exact staged publication snapshot (approximately 5.47 MB) and reported no leaks.
-- The continuous Gitleaks GitHub Action also passed against the full published Git history: https://github.com/Ryian-1/MohallaFlow/actions/runs/43371915159.
+- The continuous Gitleaks GitHub Action passed against the full published Git history in run https://github.com/Ryian-1/MohallaFlow/actions/runs/43381104036.
 - Dependabot is configured for weekly Flutter/Dart Pub, Functions npm, Firestore QA npm and GitHub Actions updates.
 - The remote Git tree was checked after publication; no `.rules` files or matching Firebase credential/configuration files were present.
 - The previous private-history backup was retained locally by the maintainer.
@@ -38,15 +38,17 @@ A secret scan is evidence for the scanned snapshot, not a guarantee that future 
 
 ## CI boundary
 
-Public GitHub Actions runs Flutter formatting, static analysis and unit/widget tests, plus Cloud Functions lint and Node.js unit tests.
+Public GitHub Actions runs Flutter formatting, static analysis and unit/widget tests; Cloud Functions lint/unit tests; npm and recursive OSV dependency audits; full-history Gitleaks scanning; and the Flutter payroll callable SDK integration on an Android Emulator. The payroll integration creates a temporary, narrow test-only Firestore rules fixture in the CI workspace, uses synthetic demo data and removes its fixture/test data on exit. This fixture is not Candidate G and is not a production ruleset.
 
-Firestore and Functions Emulator suites that require the privately retained Candidate G rules file are maintainer-only validation. The rules candidate is intentionally not published to make public CI pass. Production rules are not present and must not be deployed from this repository.
+The broader Firestore authorization/attendance Emulator suites that require the privately retained Candidate G rules file remain maintainer-only validation. The rules candidate is intentionally not published to make public CI pass. Production rules are not present and must not be deployed from this repository.
 
 ## Release and licensing limitations
 
 - Candidate G is Emulator-validated only and is not approved for production.
 - Production Firebase acceptance, App Check enforcement, IAM review, data protection and backup/restore acceptance remain outstanding.
 - Android/iOS store-distribution signing and release acceptance remain outstanding.
+- Public CI run 43381104036 passed all six jobs on 13 November 2026, including payroll SDK Emulator integration, npm audits, recursive OSV scan and full-history Gitleaks scan.
+- Dependabot's GitHub Actions updates to checkout v7 and setup-node v7 are included in the passing workflow. Major Firebase 13 / rules-unit-testing 6 updates remain unmerged pending combined private Emulator validation.
 - Genuine sanitised screenshots and legal/ownership review remain outstanding.
 - No open-source licence has been granted. Public visibility does not grant reuse, modification, redistribution or commercial deployment rights for first-party code or brand assets.
 - Third-party components remain subject to their respective licences; see `THIRD_PARTY_NOTICES.md` and the per-ecosystem inventories. The documented provenance caveats remain open for review.
