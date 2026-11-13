@@ -21,6 +21,10 @@ const String password = 'MohallaFlow-Integration-2026!';
 const String householdId = 'household-four-role';
 const String residentId = 'resident-four-role';
 const String workerId = 'worker-four-role';
+const String firebaseEmulatorHost = String.fromEnvironment(
+  'FIREBASE_EMULATOR_HOST',
+  defaultValue: '127.0.0.1',
+);
 
 enum RoleCase { admin, resident, cleanlinessManager, worker }
 
@@ -98,9 +102,9 @@ void main() {
       final auth = FirebaseAuth.instance;
       final firestore = FirebaseFirestore.instance;
 
-      await auth.useAuthEmulator('127.0.0.1', 9099);
+      await auth.useAuthEmulator(firebaseEmulatorHost, 9099);
 
-      firestore.useFirestoreEmulator('127.0.0.1', 8080);
+      firestore.useFirestoreEmulator(firebaseEmulatorHost, 8080);
       firestore.settings = const Settings(persistenceEnabled: false);
 
       await auth.signOut();
