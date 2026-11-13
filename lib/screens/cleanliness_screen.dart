@@ -1255,6 +1255,9 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
     final workerName = data['assignedWorkerName'] as String? ?? 'Unassigned';
     final priority = data['priority'] as String? ?? 'normal';
     final status = data['status'] as String? ?? 'assigned';
+    final rawComplaintId = data['sourceComplaintId'];
+    final isComplaintLinkedTask =
+        rawComplaintId is String && rawComplaintId.trim().isNotEmpty;
 
     final createdAt = data['createdAt'];
     final dateLabel = createdAt is Timestamp
@@ -1290,12 +1293,18 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
                   _updateTaskStatus(document, value);
                 },
                 itemBuilder: (context) {
-                  return _statuses.map((statusOption) {
-                    return PopupMenuItem<String>(
-                      value: statusOption,
-                      child: AppText(_statusLabel(statusOption)),
-                    );
-                  }).toList();
+                  return _statuses
+                      .where(
+                        (statusOption) =>
+                            !isComplaintLinkedTask ||
+                            statusOption != 'completed',
+                      )
+                      .map((statusOption) {
+                        return PopupMenuItem<String>(
+                          value: statusOption,
+                          child: AppText(_statusLabel(statusOption)),
+                        );
+                      }).toList();
                 },
                 icon: const Icon(
                   Icons.more_vert_rounded,
@@ -1320,6 +1329,30 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
               ),
             ],
           ),
+          if (isComplaintLinkedTask && status != 'completed') ...[
+            const SizedBox(height: 9),
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: AppTheme.textGrey,
+                  size: 14,
+                ),
+                SizedBox(width: 6),
+                Expanded(
+                  child: AppText(
+                    'The assigned worker completes this task to resolve the resident complaint.',
+                    style: TextStyle(
+                      color: AppTheme.textGrey,
+                      fontSize: 10,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 11),
           AppText(
             location,
