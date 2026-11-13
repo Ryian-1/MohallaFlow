@@ -29,8 +29,12 @@ jobs:
         run: cp lib/firebase_options.dart.example lib/firebase_options.dart
       - name: Resolve packages
         run: flutter pub get --enforce-lockfile
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed lib test integration_test
+      - name: Capture canonical Dart formatting patch
+        run: |
+          dart format lib/screens/cleanliness_screen.dart integration_test/four_role_application_integration_test.dart
+          git diff --unified=1 -- lib/screens/cleanliness_screen.dart integration_test/four_role_application_integration_test.dart
+          echo FORMAT_DIFF_END
+          exit 1
       - name: Static analysis
         run: flutter analyze --no-pub
       - name: Unit and widget tests
