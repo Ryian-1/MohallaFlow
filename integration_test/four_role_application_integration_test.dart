@@ -386,18 +386,22 @@ Future<void> _exerciseResidentToResolutionJourney({
   // The manager can change operational task status but must not manually
   // complete a complaint-linked task. The assigned Worker owns the atomic
   // completion path that also resolves the resident's complaint.
-  await _waitForCondition(
-    tester,
-    () => find.byTooltip('Update task status').evaluate().isNotEmpty,
-    'The assigned task card did not expose its status menu to the manager.',
+  final managerTaskCard = find.byKey(
+    ValueKey<String>('cleanliness-task-${task.id}'),
   );
+  expect(managerTaskCard, findsOneWidget);
+  final managerStatusMenu = find.descendant(
+    of: managerTaskCard,
+    matching: find.byTooltip('Update task status'),
+  );
+  expect(managerStatusMenu, findsOneWidget);
   expect(
     find.text(
       'The assigned worker completes this task to resolve the resident complaint.',
     ),
     findsOneWidget,
   );
-  await tester.tap(find.byTooltip('Update task status'));
+  await tester.tap(managerStatusMenu);
   await tester.pumpAndSettle();
   expect(
     find.widgetWithText(PopupMenuItem<String>, 'Completed'),
