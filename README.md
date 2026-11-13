@@ -8,7 +8,7 @@
 
 MohallaFlow is a Flutter-based residential community and colony-management application. It brings resident issue reporting, central administration, cleanliness operations, maintenance coordination, workforce workflows and community records into one role-based mobile experience.
 
-> **Project status — 11 November 2026:** Public code-showcase preparation / active development. The project has passed substantial local functional, security-rules and platform-build verification. Production Firebase approval, store-distribution signing, live-service acceptance and final publication gates remain separate requirements.
+> **Project status — 13 November 2026:** A curated public code-showcase snapshot has been published to GitHub. This is not a production release. Production Firebase approval, store-distribution signing, live-service acceptance, legal/ownership review and remaining publication gates are separate requirements.
 
 ## Product roles
 
@@ -119,7 +119,7 @@ The dependency manifests and lockfiles define the exact package versions.
 
 ## Verified engineering baseline
 
-**Verification date: 11 November 2026.** The following results were obtained from local project runs:
+**Local verification baseline: 11 November 2026.** The following results were obtained from local project runs; they are not a claim that every suite has been rerun from a clean public clone:
 
 | Verification | Result |
 |---|---|
@@ -136,7 +136,7 @@ The dependency manifests and lockfiles define the exact package versions.
 | Android release build | APK successfully generated |
 | iOS device release build | Successfully compiled without code signing |
 | iOS app icon catalog | 19 entries valid; marketing icon matches master artwork |
-| Curated publication security scan | 227 files scanned; zero Gitleaks findings |
+| Published snapshot security scan | 503 tracked files; approximately 5.47 MB scanned by Gitleaks; zero leaks found |
 
 The four-role integration runner used the iPhone 18 Pro simulator and an isolated demo Firebase project. Functions and Firestore tests also use local emulators and synthetic fixtures.
 
@@ -146,19 +146,11 @@ These results do not establish App Store distribution signing, Play Store public
 
 ## Firestore security status
 
-The active local QA candidate is:
+This public repository intentionally contains **no Firebase, Firestore or Storage security-rule files**. The production rules and the privately retained Emulator QA candidate are excluded from the public Git tree and its history.
 
-`qa_candidates/firestore_candidate_g.rules`
+The maintainer's Candidate G has passed targeted authorization/attendance checks and the extended isolated Emulator suite in a private QA workspace. It is Emulator-validated only, is not included in this repository and is not approved for production deployment.
 
-SHA-256:
-
-`7f30e3bdd6b6e244e66c33baaa32a6ee3ef04beb6799bc377f87f29bac8a2ab0`
-
-Candidate G passed targeted authorization and attendance checks and the extended isolated Emulator suite.
-
-> **Important:** Candidate G is emulator-validated, not approved for production deployment. It is included for QA and review only. It is not a production ruleset.
-
-Do not deploy this candidate or replace production rules without a separate rules review, full authorization acceptance and explicit deployment approval.
+Do not add private rules to the public repository to make CI pass. Do not deploy any rules or replace production rules without a separate independent review, full authorization acceptance and explicit deployment approval.
 
 ## Requirements
 
@@ -230,26 +222,18 @@ npm --prefix functions run test:worker-private-migration
 npm audit --prefix functions
 ```
 
-Run isolated Firestore rules QA with the required Node.js, Java and Firebase CLI versions:
+### Maintainer-only Emulator and integration QA
+
+The following runners require the privately retained, SHA-pinned Candidate G rules file. That file is deliberately excluded from the public repository, so these commands will stop in a public-only clone until the maintainer privately provisions the reviewed QA fixture:
 
 ```bash
 bash tool/firestore_rules_qa/run.sh
 bash tool/firestore_rules_qa/run_extended_suite.sh
-```
-
-Run the Functions Emulator and payroll callable integration suite:
-
-```bash
 bash tool/functions_emulator_qa/run.sh
-```
-
-Run the four-role integration test on a supported iOS Simulator:
-
-```bash
 bash tool/four_role_integration_v4/run.sh
 ```
 
-These scripts use isolated demo project configuration and synthetic test data. Read the corresponding script and QA documentation before adapting them to another environment.
+Use only isolated demo project configuration and synthetic data. Never commit the private rules candidate or production rules to make these commands work. Read each runner before use; the runners are not production deployment commands.
 
 ## Build
 
@@ -289,7 +273,7 @@ Use the [screenshot capture plan](docs/publication/SCREENSHOT_CAPTURE_PLAN.md) t
 - App Check enforcement must be verified in each target Firebase environment.
 - Live push notification and APNs delivery require separate environment-specific acceptance.
 - iOS distribution signing and App Store packaging remain outstanding.
-- GitHub Actions must be observed on the actual publication commit.
+- Public GitHub Actions is configured to run checks that do not require private rules; confirm the corrected workflow run is green.
 - Online dependency advisory scans should be rerun when registry connectivity is available.
 - Genuine release screenshots and ownership/licensing review remain outstanding.
 
@@ -303,6 +287,6 @@ Include relevant test evidence in pull requests. Do not submit local Firebase bi
 
 ## License and ownership
 
-No open-source licence has been granted in this repository. The project is presented for public inspection and evaluation; publication does not grant permission to reuse, modify, redistribute or commercially deploy the original project code or brand assets.
+No open-source licence has been granted in this repository. The repository is a public code showcase, not an open-source grant. Publication does not grant permission to reuse, modify, redistribute or commercially deploy the original project code or brand assets.
 
 Third-party dependencies and components remain subject to their respective licences. Ownership and redistribution rights for all original and third-party assets must be reviewed before any future open-source licence is assigned.
