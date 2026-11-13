@@ -55,8 +55,8 @@ The public workflow covers Flutter format, analysis and unit/widget tests, plus 
 
 ## 4. Checks still requiring fresh evidence
 
-- [ ] Rerun online `npm audit` when registry connectivity is available.
-- [ ] Rerun OSV lockfile scanning when `api.osv.dev` is reachable.
+- [x] Online `npm audit --audit-level=moderate` passed for `functions/package-lock.json` and `firestore-rules-tests/package-lock.json` in public GitHub Actions run `4bb2e9e5fd6c579827b290338ebdeb30d9f342ee` (13 November 2026). This means no moderate-or-higher npm advisories were reported by those audits at scan time.
+- [x] OSV-Scanner passed against `pubspec.lock`, `functions/package-lock.json` and `firestore-rules-tests/package-lock.json` in the same run; no vulnerability findings were reported by the scanner at scan time.
 - [ ] Execute the Flutter payroll SDK integration test on a simulator/device against its dedicated local Emulator fixture.
 - [ ] Validate a clean clone and documented setup from a separate environment.
 - [ ] Re-run relevant functional suites after any application-source changes.
@@ -91,8 +91,8 @@ No open-source licence is currently granted in this repository. Public visibilit
 
 ## 7. Release decision
 
-**Current decision: PUBLIC CODE SHOWCASE PUBLISHED; NOT READY FOR PRODUCTION DEPLOYMENT OR STORE RELEASE.**
+**Current decision: PUBLIC CODE SHOWCASE PUBLISHED; PUBLIC CI AND CURRENT LOCKFILE SECURITY SCANS PASS; NOT READY FOR PRODUCTION DEPLOYMENT OR STORE RELEASE.**
 
-The repository is public and the initial snapshot has an independent clean history. Secret scanning and the initial remote-tree exclusion check passed. The public CI has been adjusted to avoid private-rule dependencies; its new run must pass before the public engineering baseline is considered green.
+The repository is public and the initial snapshot has an independent clean history. Secret scanning and the initial remote-tree exclusion check passed. The public CI now passes on a fresh GitHub checkout, including Flutter checks, Functions checks, npm advisory audits and OSV lockfile scanning. The CI intentionally excludes Emulator suites requiring private Candidate G rules.
 
 Production Firestore approval, independent Firebase acceptance, distribution signing, legal/ownership approval, authentic screenshots and fresh online dependency scans remain open gates.
