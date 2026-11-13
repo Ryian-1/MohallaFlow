@@ -36,6 +36,34 @@ jobs:
       - name: Unit and widget tests
         run: flutter test --no-pub --reporter expanded
 
+  dependency-audit:
+    name: npm dependency audits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Audit Cloud Functions dependency lockfile
+        run: npm audit --prefix functions --audit-level=moderate
+      - name: Audit Firestore QA test dependency lockfile
+        run: npm audit --prefix firestore-rules-tests --audit-level=moderate
+
+  osv-scan:
+    name: OSV lockfile vulnerability scan
+    permissions:
+      contents: read
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.7.1
+    with:
+      scan-args: |-
+        --lockfile=./pubspec.lock
+        --lockfile=./functions/package-lock.json
+        --lockfile=./firestore-rules-tests/package-lock.json
+      upload-sarif: false
+      fail-on-vuln: true
+
   functions:
     name: Cloud Functions lint and unit tests
     runs-on: ubuntu-latest
