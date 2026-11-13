@@ -1265,6 +1265,7 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
         : 'Date pending';
 
     return Container(
+      key: ValueKey<String>('cleanliness-task-${document.id}'),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: AppTheme.white,
