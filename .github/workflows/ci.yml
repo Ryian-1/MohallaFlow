@@ -69,7 +69,7 @@ jobs:
         run: npm audit --prefix firestore-rules-tests --audit-level=moderate
 
   osv-scan:
-    name: OSV lockfile vulnerability scan
+    name: OSV recursive dependency vulnerability scan
     permissions:
       actions: read
       contents: read
@@ -77,9 +77,8 @@ jobs:
     uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.7.1
     with:
       scan-args: |-
-        --lockfile=./pubspec.lock
-        --lockfile=./functions/package-lock.json
-        --lockfile=./firestore-rules-tests/package-lock.json
+        --recursive
+        ./
       upload-sarif: false
       fail-on-vuln: true
 
