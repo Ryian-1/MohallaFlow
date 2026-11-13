@@ -29,6 +29,8 @@ Clearly labelled example templates such as `.firebaserc.example`, `firebase.json
 
 - The initial publication commit is a root commit with zero parents. The previous private Git history was not included in the public push.
 - Gitleaks scanned the exact staged publication snapshot (approximately 5.47 MB) and reported no leaks.
+- The continuous Gitleaks GitHub Action also passed against the full published Git history: https://github.com/Ryian-1/MohallaFlow/actions/runs/43371915159.
+- Dependabot is configured for weekly Flutter/Dart Pub, Functions npm, Firestore QA npm and GitHub Actions updates.
 - The remote Git tree was checked after publication; no `.rules` files or matching Firebase credential/configuration files were present.
 - The previous private-history backup was retained locally by the maintainer.
 
