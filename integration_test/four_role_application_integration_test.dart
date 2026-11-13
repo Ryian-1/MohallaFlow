@@ -379,6 +379,37 @@ Future<void> _exerciseResidentToResolutionJourney({
   final acknowledgedComplaint = await complaint.reference.get();
   expect(acknowledgedComplaint.data()?['status'], 'acknowledged');
 
+  // The manager can change operational task status but must not manually
+  // complete a complaint-linked task. The assigned Worker owns the atomic
+  // completion path that also resolves the resident's complaint.
+  await _waitForCondition(
+    tester,
+    () => find.byTooltip('Update task status').evaluate().isNotEmpty,
+    'The assigned task card did not expose its status menu to the manager.',
+  );
+  expect(
+    find.text(
+      'The assigned worker completes this task to resolve the resident complaint.',
+    ),
+    findsOneWidget,
+  );
+  await tester.tap(find.byTooltip('Update task status'));
+  await tester.pumpAndSettle();
+  expect(
+    find.widgetWithText(PopupMenuItem<String>, 'Completed'),
+    findsNothing,
+    reason: 'Manager must not have a manual completion action for a linked task.',
+  );
+  await tester.binding.handlePopRoute();
+  await tester.pumpAndSettle();
+
+  final managerTaskSnapshot = await task.reference.get();
+  expect(
+    managerTaskSnapshot.data()?['status'],
+    'assigned',
+    reason: 'Opening the manager task menu must not mutate task state.',
+  );
+
   await _endRoleSession(tester, auth);
 
   // 3. Assigned Worker starts and completes the task through the task card.
