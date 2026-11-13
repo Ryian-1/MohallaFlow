@@ -398,7 +398,8 @@ Future<void> _exerciseResidentToResolutionJourney({
   expect(
     find.widgetWithText(PopupMenuItem<String>, 'Completed'),
     findsNothing,
-    reason: 'Manager must not have a manual completion action for a linked task.',
+    reason:
+        'Manager must not have a manual completion action for a linked task.',
   );
   await tester.binding.handlePopRoute();
   await tester.pumpAndSettle();
