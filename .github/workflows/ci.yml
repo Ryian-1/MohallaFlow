@@ -83,6 +83,47 @@ jobs:
       upload-sarif: false
       fail-on-vuln: true
 
+  payroll-sdk-integration:
+    name: Flutter payroll callable SDK integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - name: Set up Java for Firebase Emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.9
+          cache: true
+      - name: Create compile-only Firebase options
+        run: cp lib/firebase_options.dart.example lib/firebase_options.dart
+      - name: Resolve Flutter packages
+        run: flutter pub get --enforce-lockfile
+      - name: Install Cloud Functions dependencies
+        run: npm ci --prefix functions
+      - name: Install pinned Firebase CLI
+        run: npm install --global firebase-tools@15.34.2
+      - name: Run Flutter SDK integration on Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          script: bash tool/payroll_sdk_integration/run_ci.sh
+
   functions:
     name: Cloud Functions lint and unit tests
     runs-on: ubuntu-latest
