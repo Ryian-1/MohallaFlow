@@ -8,7 +8,7 @@
 
 MohallaFlow is a Flutter-based residential community and colony-management application. It brings resident issue reporting, central administration, cleanliness operations, maintenance coordination, workforce workflows and community records into one role-based mobile experience.
 
-> **Project status — 13 November 2026:** A curated public code-showcase snapshot has been published to GitHub. This is not a production release. Production Firebase approval, store-distribution signing, live-service acceptance, legal/ownership review and remaining publication gates are separate requirements.
+> **Project status — 13 November 2026:** A curated public code-showcase snapshot has been published to GitHub. The six-job public CI, dependency audits, full-history Gitleaks scan and payroll Flutter SDK Emulator integration pass. This is not a production release. Production Firebase approval, store-distribution signing, live-service acceptance and legal/ownership review remain separate gates.
 
 ## Product roles
 
@@ -138,7 +138,7 @@ The dependency manifests and lockfiles define the exact package versions.
 | iOS app icon catalog | 19 entries valid; marketing icon matches master artwork |
 | Published snapshot security scan | 503 tracked files; approximately 5.47 MB scanned by Gitleaks; zero leaks found |
 
-The four-role integration runner used the iPhone 18 Pro simulator and an isolated demo Firebase project. Functions and Firestore tests also use local emulators and synthetic fixtures.
+The four-role integration runner used the iPhone 18 Pro simulator and an isolated demo Firebase project. Functions and Firestore tests also use local emulators and synthetic fixtures. The public GitHub Actions run on 13 November 2026 passed all six jobs, including the Flutter payroll callable SDK integration on an Android Emulator with a temporary payroll-only test rules fixture.
 
 The Android release APK generated during verification was approximately 69.7 MB. The unsigned iOS device application build was approximately 57.6 MB.
 
@@ -222,6 +222,14 @@ npm --prefix functions run test:worker-private-migration
 npm audit --prefix functions
 ```
 
+### Payroll Flutter SDK integration
+
+The public CI runs the payroll Flutter SDK integration on an Android Emulator using a demo project, synthetic Auth/Firestore data and a temporary payroll-only Firestore rules fixture. The fixture is generated in the CI workspace and removed at job exit; it is neither Candidate G nor a production ruleset. To run the same runner locally, use a Linux host with an Android Emulator already available as `emulator-5554`, Node.js 22, Flutter 3.47.9, Java 21 and Firebase CLI 15.34.2:
+
+```bash
+bash tool/payroll_sdk_integration/run_ci.sh
+```
+
 ### Maintainer-only Emulator and integration QA
 
 The following runners require the privately retained, SHA-pinned Candidate G rules file. That file is deliberately excluded from the public repository, so these commands will stop in a public-only clone until the maintainer privately provisions the reviewed QA fixture:
@@ -273,8 +281,8 @@ Use the [screenshot capture plan](docs/publication/SCREENSHOT_CAPTURE_PLAN.md) t
 - App Check enforcement must be verified in each target Firebase environment.
 - Live push notification and APNs delivery require separate environment-specific acceptance.
 - iOS distribution signing and App Store packaging remain outstanding.
-- Public GitHub Actions is configured to run checks that do not require private rules; confirm the corrected workflow run is green.
-- Keep dependency advisory scanning enabled; rerun after dependency/lockfile changes.
+- Public GitHub Actions passed all six jobs on 13 November 2026, including the payroll SDK Emulator integration, npm audits, recursive OSV scan and full-history Gitleaks scan. The broader Candidate G authorization suite remains maintainer-only.
+- Keep dependency advisory scanning and Dependabot enabled; rerun after dependency/lockfile changes.
 - Genuine release screenshots and ownership/licensing review remain outstanding.
 
 See the [publication checklist](docs/publication/PUBLICATION_CHECKLIST.md) for the remaining release gates.
