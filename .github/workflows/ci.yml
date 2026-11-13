@@ -113,6 +113,39 @@ jobs:
         run: flutter pub get --enforce-lockfile
       - name: Install Cloud Functions dependencies
         run: npm ci --prefix functions
+      - name: Create compile-only Android Google Services configuration
+        run: |
+          cat > android/app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "demo-mohallaflow",
+              "storage_bucket": "demo-mohallaflow.invalid"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.mohallaflow.mohalla_flow"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "ci-placeholder-not-a-real-key"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          JSON
       - name: Install pinned Firebase CLI
         run: npm install --global firebase-tools@15.34.2
       - name: Run Flutter SDK integration on Android Emulator
