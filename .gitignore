@@ -140,3 +140,6 @@ firebase-debug.log
 **/.stage6-*/
 **/.v4-worker-ops.*/
 **/*.stage6-location-fix-backup
+# Temporary private, emulator-only payroll integration fixtures
+/.firestore-payroll-sdk-qa-*.rules
+/.firebase-payroll-sdk-qa-*.json
