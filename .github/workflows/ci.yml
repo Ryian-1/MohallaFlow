@@ -132,7 +132,7 @@ jobs:
                 "oauth_client": [],
                 "api_key": [
                   {
-                    "current_key": "ci-placeholder-not-a-real-key"
+                    "current_key": "A00000000000000000000000000000000000000"
                   }
                 ],
                 "services": {

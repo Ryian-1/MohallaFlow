@@ -19,7 +19,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'ci-placeholder-not-a-real-key',
+    apiKey: 'A00000000000000000000000000000000000000',
     appId: '1:000000000000:web:000000000000000000000000',
     messagingSenderId: '000000000000',
     projectId: 'demo-mohallaflow',
@@ -28,7 +28,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'ci-placeholder-not-a-real-key',
+    apiKey: 'A00000000000000000000000000000000000000',
     appId: '1:000000000000:android:0000000000000000000000',
     messagingSenderId: '000000000000',
     projectId: 'demo-mohallaflow',
@@ -36,7 +36,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'ci-placeholder-not-a-real-key',
+    apiKey: 'A00000000000000000000000000000000000000',
     appId: '1:000000000000:ios:0000000000000000000000',
     messagingSenderId: '000000000000',
     projectId: 'demo-mohallaflow',
