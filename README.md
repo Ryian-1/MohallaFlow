@@ -274,7 +274,7 @@ Use the [screenshot capture plan](docs/publication/SCREENSHOT_CAPTURE_PLAN.md) t
 - Live push notification and APNs delivery require separate environment-specific acceptance.
 - iOS distribution signing and App Store packaging remain outstanding.
 - Public GitHub Actions is configured to run checks that do not require private rules; confirm the corrected workflow run is green.
-- Online dependency advisory scans should be rerun when registry connectivity is available.
+- Keep dependency advisory scanning enabled; rerun after dependency/lockfile changes.
 - Genuine release screenshots and ownership/licensing review remain outstanding.
 
 See the [publication checklist](docs/publication/PUBLICATION_CHECKLIST.md) for the remaining release gates.
