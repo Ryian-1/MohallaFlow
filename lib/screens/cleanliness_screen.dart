@@ -762,53 +762,18 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
       final sourceComplaintId = rawComplaintId is String
           ? rawComplaintId.trim()
           : '';
-      final batch = FirebaseFirestore.instance.batch();
 
-      // A complaint-linked task and its originating complaint are one
-      // operational record. Completing the task from the manager screen must
-      // resolve that exact complaint in the same atomic batch.
+      // Complaint-linked tasks must be completed by the assigned Worker.
+      // The Worker Dashboard performs task completion and complaint resolution
+      // together in one atomic batch, preserving the resident-facing lifecycle.
       if (newStatus == 'completed' && sourceComplaintId.isNotEmpty) {
-        if (taskData['status'] == 'completed') {
-          _showMessage('This task is already completed.');
-          return;
-        }
-
-        final complaintReference = _complaints.doc(sourceComplaintId);
-        final complaintSnapshot = await complaintReference.get();
-        if (!complaintSnapshot.exists) {
-          _showMessage(
-            'The linked complaint could not be found. Refresh and review the task before completing it.',
-          );
-          return;
-        }
-
-        final complaintData =
-            complaintSnapshot.data() ?? <String, dynamic>{};
-        final complaintStatus = complaintData['status']?.toString() ?? '';
-        final existingResolutionTaskId =
-            complaintData['resolutionTaskId']?.toString() ?? '';
-
-        if (complaintStatus == 'resolved' &&
-            existingResolutionTaskId == task.id) {
-          // This is already the exact resolution pair. Leave the complaint
-          // unchanged and let the task update proceed only when necessary.
-        } else if (complaintData['complaintType'] == 'cleanliness' &&
-            (complaintStatus == 'acknowledged' ||
-                complaintStatus == 'in_progress')) {
-          batch.update(complaintReference, {
-            'status': 'resolved',
-            'updatedAt': FieldValue.serverTimestamp(),
-            'resolvedAt': FieldValue.serverTimestamp(),
-            'resolutionTaskId': task.id,
-          });
-        } else {
-          _showMessage(
-            'The linked complaint is no longer ready for task completion. Refresh and review its status.',
-          );
-          return;
-        }
+        _showMessage(
+          'The assigned worker must complete this complaint-linked task. The originating complaint will be resolved automatically when the worker reports completion.',
+        );
+        return;
       }
 
+      final batch = FirebaseFirestore.instance.batch();
       batch.update(task.reference, {
         'status': newStatus,
         'updatedAt': FieldValue.serverTimestamp(),
