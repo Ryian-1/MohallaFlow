@@ -95,4 +95,4 @@ No open-source licence is currently granted in this repository. Public visibilit
 
 The repository is public and the initial snapshot has an independent clean history. Secret scanning and the initial remote-tree exclusion check passed. The public CI now passes on a fresh GitHub checkout, including Flutter checks, Functions checks, npm advisory audits and OSV lockfile scanning. The CI intentionally excludes Emulator suites requiring private Candidate G rules.
 
-Production Firestore approval, independent Firebase acceptance, distribution signing, legal/ownership approval, authentic screenshots and fresh online dependency scans remain open gates.
+Production Firestore approval, independent Firebase acceptance, distribution signing, legal/ownership approval, authentic screenshots and the Flutter payroll SDK simulator integration remain open gates.
