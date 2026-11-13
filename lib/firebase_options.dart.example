@@ -1,0 +1,46 @@
+// Compile-only Firebase configuration for CI and local static checks.
+// This file is NOT connected to a real Firebase project.
+// Developers must run `flutterfire configure` for their own Firebase project.
+import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+
+class DefaultFirebaseOptions {
+  static FirebaseOptions get currentPlatform {
+    if (kIsWeb) return web;
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return android;
+      case TargetPlatform.iOS:
+        return ios;
+      default:
+        return web;
+    }
+  }
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'ci-placeholder-not-a-real-key',
+    appId: '1:000000000000:web:000000000000000000000000',
+    messagingSenderId: '000000000000',
+    projectId: 'demo-mohallaflow',
+    authDomain: 'demo-mohallaflow.invalid',
+    storageBucket: 'demo-mohallaflow.invalid',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'ci-placeholder-not-a-real-key',
+    appId: '1:000000000000:android:0000000000000000000000',
+    messagingSenderId: '000000000000',
+    projectId: 'demo-mohallaflow',
+    storageBucket: 'demo-mohallaflow.invalid',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'ci-placeholder-not-a-real-key',
+    appId: '1:000000000000:ios:0000000000000000000000',
+    messagingSenderId: '000000000000',
+    projectId: 'demo-mohallaflow',
+    storageBucket: 'demo-mohallaflow.invalid',
+    iosBundleId: 'com.example.mohallaflow',
+  );
+}

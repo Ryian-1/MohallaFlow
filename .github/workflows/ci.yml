@@ -1,0 +1,94 @@
+name: MohallaFlow CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mohalla-flow-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter:
+    name: Flutter format, analysis and tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.9
+          cache: true
+      - name: Create compile-only Firebase options
+        run: cp lib/firebase_options.dart.example lib/firebase_options.dart
+      - name: Resolve packages
+        run: flutter pub get --enforce-lockfile
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed lib test integration_test
+      - name: Static analysis
+        run: flutter analyze --no-pub
+      - name: Unit and widget tests
+        run: flutter test --no-pub --reporter expanded
+
+  functions:
+    name: Cloud Functions checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci --prefix functions
+      - name: Syntax / lint check
+        run: npm run --prefix functions lint
+      - name: Node 22 unit tests
+        run: |
+          npm run --prefix functions test:resident-registration
+          npm run --prefix functions test:app-check
+          npm run --prefix functions test:worker-private-migration
+      - name: Set up Java for Firebase Emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install pinned Firebase CLI
+        run: npm install --global firebase-tools@15.34.2
+      - name: Run Functions, Auth and Firestore Emulator suites
+        run: bash tool/functions_emulator_qa/run.sh
+
+  firestore-rules:
+    name: Firestore Emulator authorization tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.22.2
+      - name: Set up Java for Firebase Emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pinned Firebase CLI
+        run: npm install --global firebase-tools@15.34.2
+      - name: Run isolated Rules suites
+        run: bash tool/firestore_rules_qa/run.sh
+      - name: Run extended standalone Rules suites
+        run: bash tool/firestore_rules_qa/run_extended_suite.sh

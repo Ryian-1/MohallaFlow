@@ -1,0 +1,25 @@
+{
+  "name": "mohallaflow-functions",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "lint": "node --check index.js && node --check scripts/migrate_worker_private_profiles.js && node --check lib/worker_private_profile_migration.js && node --check lib/notification_scalar_migration.js && node --check scripts/migrate_notification_scalar_recipients.js && node --check test/notification-scalar-migration.emulator.test.js",
+    "test:resident-registration": "node --test test/phone.test.js",
+    "test:payroll": "node --test test/payroll.test.js",
+    "test:app-check": "node --test test/app-check-config.test.js",
+    "test:worker-private-migration": "node --test test/worker-private-migration.test.js",
+    "test:worker-private-migration-emulator": "node --test test/worker-private-migration-emulator.test.js",
+    "test:emergency-escalation-emulator": "node --test test/emergency-escalation.emulator.test.js",
+    "test:notification-scalar-migration-emulator": "node --test test/notification-scalar-migration.emulator.test.js"
+  },
+  "dependencies": {
+    "firebase-admin": "14.5.0",
+    "firebase-functions": "7.4.0"
+  },
+  "overrides": {
+    "fast-xml-parser": "5.12.0"
+  }
+}
