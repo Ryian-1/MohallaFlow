@@ -65,14 +65,19 @@ void main() {
       region: 'asia-south1',
     );
 
-    final emulatorHost = '127.0.0.1';
+    // iOS Simulator / local runs use loopback. Android Emulator CI passes
+    // FIREBASE_EMULATOR_HOST=10.0.2.2 to reach the host runner.
+    const emulatorHost = String.fromEnvironment(
+      'FIREBASE_EMULATOR_HOST',
+      defaultValue: '127.0.0.1',
+    );
 
     await auth.useAuthEmulator(emulatorHost, 9099);
 
     firestore.useFirestoreEmulator(emulatorHost, 8080);
     firestore.settings = const Settings(persistenceEnabled: false);
 
-    functions.useFunctionsEmulator('127.0.0.1', 5001);
+    functions.useFunctionsEmulator(emulatorHost, 5001);
 
     final callable = functions.httpsCallable('approveColonyPayrollRun');
 
