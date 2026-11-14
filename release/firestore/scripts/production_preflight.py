@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 PROJECT="mohallaflow"
-RULES_SHA="c5172f7b37059687f4545af60787eb383e5c8f1c0f79572e3ae5e975915899ed"
+RULES_SHA="3b54f18560ec65a1b12366d2f5df08765ddee82e4d0c0b40b2d0649a1f85715c"
 INDEX_SHA="29fd77ce28c3a52fdfa7dce9834683a6c441cd7bfb75de54cdc5e19e35b1bd63"
 ROOT="https://firestore.googleapis.com/v1/projects/mohallaflow/databases/%28default%29/documents"
 ROLES={"admin","resident","cleanliness_manager","worker"}
