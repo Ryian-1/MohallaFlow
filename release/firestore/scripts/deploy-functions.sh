@@ -33,13 +33,8 @@ echo "Deploy Firestore indexes and Rules first; configure App Check before calla
 read -r -p "Type DEPLOY MOHALLAFLOW FUNCTIONS to continue: " answer
 [[ "$answer" == "DEPLOY MOHALLAFLOW FUNCTIONS" ]] || { echo "No Functions changed."; exit 0; }
 cd "$ROOT"
-firebase deploy --only \
-  functions:notifyEmergencySOSCreated,\
-functions:notifyEmergencySOSUpdated,\
-functions:escalateUnacknowledgedEmergencyAlerts,\
-functions:claimResidentRegistration,\
-functions:requestAccountDeletion,\
-functions:approveColonyPayrollRun \
+firebase deploy \
+  --only "functions:notifyEmergencySOSCreated,functions:notifyEmergencySOSUpdated,functions:escalateUnacknowledgedEmergencyAlerts,functions:claimResidentRegistration,functions:requestAccountDeletion,functions:approveColonyPayrollRun" \
   --project "$PROJECT" \
   --config "$CONFIG"
 echo "[SUCCESS] Functions deploy command completed."
