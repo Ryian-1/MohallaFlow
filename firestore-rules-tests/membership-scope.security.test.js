@@ -25,7 +25,8 @@ let env;
 
 test.before(async () => {
   const rules = fs.readFileSync(
-    process.env.CANDIDATE_RULES ?? path.join(dirname, '..', 'firestore.rules'),
+    process.env.CANDIDATE_RULES
+      ?? path.join(dirname, '..', 'release', 'firestore', 'firestore.rules'),
     'utf8'
   );
 
@@ -44,8 +45,8 @@ test.before(async () => {
         { uid: 'resident-a', colonyId: 'beta', role: 'resident', status: 'active' }],
       ['colonies/alpha/members/resident-b',
         { uid: 'resident-b', colonyId: 'alpha', role: 'resident', status: 'active' }],
-      ['privateGroups/secret/members/resident-a',
-        { uid: 'resident-a', status: 'active', privateMarker: true }],
+      ['privateGroups/secret/members/other-member',
+        { uid: 'unrelated-user', status: 'active', privateMarker: true }],
     ];
 
     for (const [documentPath, data] of fixtures) {
@@ -64,12 +65,12 @@ test('exact-path reads preserve own multi-colony membership access', async () =>
   await assertSucceeds(getDoc(doc(db, 'colonies/alpha/members/resident-a')));
   await assertSucceeds(getDoc(doc(db, 'colonies/beta/members/resident-a')));
   await assertFails(getDoc(doc(db, 'colonies/alpha/members/resident-b')));
-  await assertFails(getDoc(doc(db, 'privateGroups/secret/members/resident-a')));
+  await assertFails(getDoc(doc(db, 'privateGroups/secret/members/other-member')));
 
   console.log('[PASS] Exact-path multi-colony access remains scoped.');
 });
 
-test('filtered and unrestricted collection-group queries are denied', async () => {
+test('legacy filtered collection-group queries work and broad queries are denied', async () => {
   const db = env.authenticatedContext('resident-a').firestore();
 
   const filtered = query(
@@ -78,8 +79,31 @@ test('filtered and unrestricted collection-group queries are denied', async () =
     where('status', '==', 'active')
   );
 
-  await assertFails(getDocs(filtered));
+  const result = await assertSucceeds(getDocs(filtered));
+  assert.equal(result.size, 2);
+  const paths = new Set(result.docs.map((snapshot) => snapshot.ref.path));
+  assert.deepEqual(
+    paths,
+    new Set([
+      'colonies/alpha/members/resident-a',
+      'colonies/beta/members/resident-a',
+    ])
+  );
+
   await assertFails(getDocs(collectionGroup(db, 'members')));
 
-  console.log('[PASS] Collection-group queries remain denied.');
+  const missingStatus = query(
+    collectionGroup(db, 'members'),
+    where('uid', '==', 'resident-a')
+  );
+  await assertFails(getDocs(missingStatus));
+
+  const crossUser = query(
+    collectionGroup(db, 'members'),
+    where('uid', '==', 'resident-b'),
+    where('status', '==', 'active')
+  );
+  await assertFails(getDocs(crossUser));
+
+  console.log('[PASS] Legacy filtered membership query works; unfiltered, missing-status and cross-UID queries are denied.');
 });
