@@ -660,6 +660,14 @@ function validMaintenanceJobUpdateNotification(data,colonyId){let jobPath=colony
 return isAdmin(colonyId) && data.eventType=='maintenance_job_updated' && data.sourceCollection=='maintenanceJobs' && exists(jobPath) && get(jobPath).data.sourceComplaintId is string && exists(colonyDocPath(colonyId,'complaints',get(jobPath).data.sourceComplaintId)) && get(colonyDocPath(colonyId,'complaints',get(jobPath).data.sourceComplaintId)).data.submittedBy is string && data.recipientKeys.hasAll(['user:'+get(colonyDocPath(colonyId,'complaints',get(jobPath).data.sourceComplaintId)).data.submittedBy]) && data.recipientKeys.hasOnly(['user:'+get(colonyDocPath(colonyId,'complaints',get(jobPath).data.sourceComplaintId)).data.submittedBy]) && getAfter(jobPath).data.status!=get(jobPath).data.status;
 
 }
+// Backward-compatible collection-group discovery for legacy clients.
+// The caller must constrain both uid and status in the query. This restores
+// the previous production rule's recursive members collection contract.
+match /{path=**}/members/{memberId} {
+  allow list: if request.auth != null
+    && resource.data.uid == request.auth.uid
+    && resource.data.status == 'active';
+}
 match /users/{userId}{
 allow get:if isOwnAccount(userId);
 
