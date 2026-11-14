@@ -8,7 +8,7 @@
 
 MohallaFlow is a Flutter-based residential community and colony-management application. It brings resident issue reporting, central administration, cleanliness operations, maintenance coordination, workforce workflows and community records into one role-based mobile experience.
 
-> **Project status — 14 November 2026:** The public code-showcase repository and release candidate are available on GitHub. All seven public CI jobs pass on the latest verified run. This is not a production release: legacy-client compatibility, production Firebase deployment and acceptance, a fresh four-role run for the Manager-menu change, store signing, genuine screenshots and legal/ownership review remain open.
+> **Project status — 14 November 2026:** The public code-showcase repository and release candidate are available on GitHub. Seven public CI jobs passed on the latest verified merged run; this release branch adds a dedicated Emulator test for legacy membership-query compatibility. This is not a production release: Firestore indexes/Rules and Functions still need deployment, controlled pilot acceptance remains outstanding, the new Manager-menu assertion still needs a fresh device run, and store signing, genuine screenshots and legal/ownership review remain open.
 
 ## Product roles
 
@@ -146,11 +146,11 @@ These results do not establish App Store distribution signing, Play Store public
 
 ## Firestore security status
 
-This release branch includes a SHA-256-pinned Firestore deployment candidate at `release/firestore/firestore.rules`, its exact index manifest and isolated deployment scripts. The candidate passed six private Firestore Emulator suites (122 passed, 0 failed, 0 skipped). Emulator validation is not production approval.
+This release branch includes the SHA-pinned Firestore Rules candidate, exact index manifest and isolated deployment scripts. The candidate passed six private Firestore Emulator suites (125 passed, 0 failed, 0 skipped). A dedicated public CI job now tests the same legacy membership query contract against the release candidate.
 
-The deployment script performs a read-only production membership census, deploys indexes before Rules, waits for required indexes to become READY, and verifies the active Rules release hash. It also contains a manual legacy-client compatibility gate because the candidate removes the former recursive `collectionGroup('members')` self-list permission.
+The Rules preserve the previously deployed `collectionGroup('members')` behavior: clients must constrain `uid == request.auth.uid` and `status == 'active'`. Emulator tests verify a resident can retrieve their own active memberships across multiple colonies; unfiltered, missing-status and cross-UID queries are denied. The recursive rule retains the historical scope for collections named `members`, so do not reuse that collection ID for unrelated data.
 
-**Production Rules deployment is on hold.** The membership census now passes, but the owner has confirmed older app builds or an external integration may exist and their membership-query behavior has not been established. Do not bypass that gate, weaken Rules to work around a permission error, or run an unscoped `firebase deploy`. See [release/README.md](release/README.md) for the controlled deployment sequence.
+The deployment scripts perform a read-only membership census, deploy indexes before Rules, wait for READY, verify the active Rules SHA, and then require the Functions script to recheck Firestore readiness before deploying backend functions. Production indexes, Rules and Functions remain undeployed. Do not run an unscoped `firebase deploy`; use [release/README.md](release/README.md).
 
 ## Requirements
 
