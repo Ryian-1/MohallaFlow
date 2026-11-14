@@ -47,8 +47,8 @@ Required index configurations:
 
 | Resource | Scope | Definition |
 |---|---|---|
-| `emergencyAlerts` | COLLECTION_GROUP composite | `status ASCENDING`, `nextEscalationAt ASCENDING` |
-| `residentLoginRegistrations.phoneNumberE164` | COLLECTION_GROUP single-field | `ASCENDING` (COLLECTION scope is also retained) |
+| `emergencyAlerts` | `COLLECTION_GROUP` composite | `status ASCENDING`, `nextEscalationAt ASCENDING` |
+| `residentLoginRegistrations.phoneNumberE164` | `COLLECTION_GROUP` single-field | `ASCENDING` (COLLECTION scope is also retained) |
 
 If the census is blocked, fix data and rerun. If Firebase rejects the compiled Ruleset size, the Rules deploy stops and the prior active Rules release remains in place. The source-size check is not a numeric compiled-size measurement.
 
@@ -60,9 +60,11 @@ After Firestore indexes and Rules are verified:
 bash release/firestore/scripts/deploy-functions.sh
 ```
 
-This installs locked dependencies, reruns Functions lint/unit tests and npm audit, and requires a separate confirmation before deploying **only these six functions**: emergency SOS in-app notification creation/updates, scheduled emergency escalation, resident phone registration linking, account deletion requests, and payroll approval.
+This installs locked dependencies, runs Functions lint and unit tests, and performs npm audit. The payroll backend suite is automatically wrapped in `firebase emulators:exec` against an isolated **`demo-mohallaflow`** project ID and the local Firestore Emulator. It does not read or write production Firestore. The emulator shuts down when the payroll test process exits. Java is required by the Firestore Emulator.
 
-**Native OS push is intentionally left disabled.** The `dispatchMohallaFlowPush` FCM dispatcher is excluded from the deployment command. The Functions script also checks Gen 2 deployments with gcloud and stops if an existing `dispatchMohallaFlowPush` function is detected; it never deletes that function automatically. If it is present, review and deliberately remove only that function before rerunning the deployment script. Firestore in-app notifications and emergency escalation remain included.
+After all checks pass, the script requires two separate confirmations before deploying **only these six functions**: emergency SOS in-app notification creation/updates, scheduled emergency escalation, resident phone registration linking, account deletion requests, and payroll approval.
+
+**Native OS push is intentionally left disabled.** The `dispatchMohallaFlowPush` FCM dispatcher is excluded from the deployment command. The Functions script also checks Gen 2 deployments with gcloud and stops if an existing `dispatchMohallaFlowPush` function is detected; it never deletes that function automatically. If it is present, review and deliberately remove only that function before rerunning the deployment. Firestore in-app notifications and emergency escalation remain included.
 
 The included callable endpoints enforce Firebase App Check when deployed. Configure Firebase App Check for Android and iOS before relying on resident phone-link, payroll and account-deletion callables. Enable the Firebase Authentication sign-in providers actually used by your app (including Phone sign-in) before pilot sign-in. Scheduled emergency escalation requires a billing-enabled Firebase project and the Firestore index above.
 
