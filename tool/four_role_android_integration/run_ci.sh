@@ -137,7 +137,7 @@ if missing or extra:
 for name in sorted(expected):
     path = root / name
     raw = path.read_bytes()
-    if len(raw) < 10_000 or not raw.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+    if len(raw) < 10_000 or raw[:8] != bytes([137, 80, 78, 71, 13, 10, 26, 10]):
         print(f"[STOP] Invalid or unexpectedly small screenshot: {name}", file=sys.stderr)
         sys.exit(1)
     width, height = struct.unpack(">II", raw[16:24])
