@@ -62,9 +62,9 @@ bash release/firestore/scripts/deploy-functions.sh
 
 This installs locked dependencies, reruns Functions lint/unit tests and npm audit, and requires a separate confirmation before deploying **only these six functions**: emergency SOS in-app notification creation/updates, scheduled emergency escalation, resident phone registration linking, account deletion requests, and payroll approval.
 
-**Native OS push is intentionally left disabled.** The `dispatchMohallaFlowPush` FCM dispatcher is excluded from the deployment command, so this does not turn on device push notifications. Firestore in-app notifications and emergency escalation still work through the included functions.
+**Native OS push is intentionally left disabled.** The `dispatchMohallaFlowPush` FCM dispatcher is excluded from the deployment command. However, this does **not** delete or disable it if it is already deployed. Before running the Functions script, execute `firebase functions:list --project mohallaflow` and confirm `dispatchMohallaFlowPush` is absent. If it is present, stop: it must be separately and deliberately removed before you can guarantee device push is off. The script requires you to type `CONFIRMED dispatchMohallaFlowPush IS ABSENT`. Firestore in-app notifications and emergency escalation remain included.
 
-The included callable endpoints enforce Firebase App Check when deployed. Configure Firebase App Check for Android and iOS before relying on resident phone-link, payroll and account-deletion callables. Scheduled emergency escalation requires a billing-enabled Firebase project and the Firestore index above.
+The included callable endpoints enforce Firebase App Check when deployed. Configure Firebase App Check for Android and iOS before relying on resident phone-link, payroll and account-deletion callables. Enable the Firebase Authentication sign-in providers actually used by your app (including Phone sign-in) before pilot sign-in. Scheduled emergency escalation requires a billing-enabled Firebase project and the Firestore index above.
 
 ## Build and publish mobile apps
 
