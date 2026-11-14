@@ -1,12 +1,12 @@
 # MohallaFlow deployment package
 
-Application branch: `fix/manager-linked-task-atomicity-20261114`
+Application branch: `main`
 
 Reviewed Firestore candidate:
 
-- Rules SHA-256: `c5172f7b37059687f4545af60787eb383e5c8f1c0f79572e3ae5e975915899ed`
-- Source bytes: 248,735 / 262,144
-- Private Firestore emulator evidence: **122 passed, 0 failed, 0 skipped** across six suites.
+- Rules SHA-256: `3b54f18560ec65a1b12366d2f5df08765ddee82e4d0c0b40b2d0649a1f85715c`
+- Source bytes: 249,119 / 262,144
+- Private Firestore emulator evidence: **125 passed, 0 failed, 0 skipped** across six suites.
 
 ## Included
 
@@ -26,7 +26,7 @@ The preflight uses your active gcloud account and reads all colonies and members
 
 **A blocked membership report must be repaired before Rules activation.** The candidate requires exact `uid` and `colonyId` membership fields, canonical lower-case roles/status, an active user profile whose `colonyIds` contains the colony, and linked resident/worker records for those roles.
 
-**Legacy client compatibility is a separate manual gate.** The checked-in app's `UserAccessService` reads `colonies/{colonyId}/members/{uid}` directly. The reviewed Rules candidate removes the previous recursive `collectionGroup('members')` self-list permission. Do not deploy while older installed clients or external integrations still depend on that broad member-list query. The deployment script requires you to type `CONFIRMED NO LEGACY MEMBER QUERIES` before it will proceed.
+**Legacy client compatibility is preserved and emulator-tested.** The candidate restores the previous production collection-group query contract: callers may query `collectionGroup('members')` only when the query constrains `uid == request.auth.uid` and `status == 'active'`. The six private Emulator suites pass 125/125, including the allowed multi-colony filtered query and denials for unfiltered, missing-status, and cross-UID queries. This intentionally retains the previous recursive rule scope for any collection named `members`; do not create unrelated `members` subcollections containing an active record for a user's UID. The deployment script requires the acknowledgement `CONFIRMED FILTERED LEGACY MEMBER QUERY COMPATIBILITY` before proceeding.
 
 ## Deploy Firestore — one command
 
@@ -93,8 +93,8 @@ Android requires the four `MOHALLAFLOW_RELEASE_*` signing values in `android/app
 
 - Public CI passed formatting, analysis, Flutter unit/widget tests, Functions lint/unit tests, dependency audits, Gitleaks, OSV and Android payroll SDK integration.
 - Private Firestore candidate CI passed six suites, 122/122.
-- An extra private Android four-role CI attempt could not boot the hosted emulator (ADB never saw `emulator-5554`); it is not counted as passed. A previous iPhone simulator four-role flow passed an earlier candidate; the latest manager-menu assertion still needs the local simulator run.
-- No production Rules release, indexes, Functions, or data were modified while preparing this package.
+- The exact Rules candidate passed all six private Firestore Emulator suites (125/125). The Android four-role job then failed before launching the app because the hosted emulator never appeared as `emulator-5554`; it is an infrastructure failure, not a test pass. The new Manager-menu assertion still needs a fresh local iPhone simulator run.
+- No production Rules release, indexes or Functions were deployed while preparing this package. One previously verified mismatched duplicate Admin membership was separately deactivated with an update-time precondition; the canonical Admin membership and user profile remain active.
 - After deployment, test sign-in and Admin, Resident, Cleanliness Manager and Worker flows with controlled pilot accounts before opening the app to residents.
 
 Do not run an unscoped `firebase deploy` from the app root.
