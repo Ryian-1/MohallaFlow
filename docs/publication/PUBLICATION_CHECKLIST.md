@@ -48,6 +48,7 @@ The first workflow run on the publication commit exposed an incorrect CI boundar
 - [x] The original Firestore job failed because the private Candidate G rules file is deliberately absent from the public repository.
 - [x] Public CI workflow corrected to run checks that can execute from the public snapshot without private security rules or production Firebase configuration.
 - [x] All seven public GitHub Actions jobs passed on 14 November 2026, run [43553930997](https://github.com/Ryian-1/MohallaFlow/actions/runs/43553930997), release-branch head `d65d579bf190bb7e2da05ebf6ff2dc6d296153e1`.
+- [x] All seven public GitHub Actions jobs also passed on the final documentation-only PR head in run [43566338360](https://github.com/Ryian-1/MohallaFlow/actions/runs/43566338360); the earlier run above remains the application-code validation run.
 - [x] Flutter format, static analysis, unit/widget tests, Cloud Functions lint/unit tests, npm audits, recursive OSV scan and full-history Gitleaks scan passed.
 - [x] Flutter payroll callable SDK integration passed on an Android Emulator against Auth, Firestore and Functions Emulators using synthetic data.
 - [x] GitHub Actions updated to `actions/checkout@v7` and `actions/setup-node@v7`; the seven-job run above passed with these versions.
