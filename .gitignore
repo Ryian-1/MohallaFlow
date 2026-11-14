@@ -146,3 +146,6 @@ firebase-debug.log
 # Local MohallaFlow production-release preflight reports
 release/firestore/reports/
 release/firestore/scripts/__pycache__/
+# Local MohallaFlow production-release preflight reports
+release/firestore/reports/
+release/firestore/scripts/__pycache__/
