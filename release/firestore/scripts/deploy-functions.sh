@@ -18,6 +18,22 @@ v=c.get("functions")
 ok=(isinstance(v,dict) and v.get("source")=="functions") or (isinstance(v,list) and any(x.get("source")=="functions" for x in v))
 if not ok:raise SystemExit("Firebase config must define Functions source ./functions.")
 PY
+
+# The FCM dispatcher is intentionally not deployed. Also refuse to continue
+# when an older deployment of that function is still active.
+EXISTING_PUSH_DISPATCHER="$(
+  gcloud functions list --gen2 --project "$PROJECT" \
+    --filter="name:dispatchMohallaFlowPush" --format="value(name)"
+)"
+if [[ -n "$EXISTING_PUSH_DISPATCHER" ]]; then
+  echo "[STOP] Existing Gen 2 FCM dispatcher detected:" >&2
+  echo "$EXISTING_PUSH_DISPATCHER" >&2
+  echo "This function can send native OS push notifications." >&2
+  echo "Do not deploy Functions while it exists if device push must remain disabled." >&2
+  echo "Review and intentionally remove only this function, then rerun the deploy script." >&2
+  exit 4
+fi
+
 npm ci --prefix "$ROOT/functions"
 npm run --prefix "$ROOT/functions" lint
 npm run --prefix "$ROOT/functions" test:resident-registration
