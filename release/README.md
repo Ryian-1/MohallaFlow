@@ -26,6 +26,8 @@ The preflight uses your active gcloud account and reads all colonies and members
 
 **A blocked membership report must be repaired before Rules activation.** The candidate requires exact `uid` and `colonyId` membership fields, canonical lower-case roles/status, an active user profile whose `colonyIds` contains the colony, and linked resident/worker records for those roles.
 
+**Legacy client compatibility is a separate manual gate.** The checked-in app's `UserAccessService` reads `colonies/{colonyId}/members/{uid}` directly. The reviewed Rules candidate removes the previous recursive `collectionGroup('members')` self-list permission. Do not deploy while older installed clients or external integrations still depend on that broad member-list query. The deployment script requires you to type `CONFIRMED NO LEGACY MEMBER QUERIES` before it will proceed.
+
 ## Deploy Firestore — one command
 
 Run from the repository root:
