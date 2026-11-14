@@ -25,10 +25,21 @@ npm run --prefix "$ROOT/functions" test:app-check
 npm run --prefix "$ROOT/functions" test:payroll
 npm run --prefix "$ROOT/functions" test:worker-private-migration
 npm audit --prefix "$ROOT/functions" --audit-level=moderate
-echo "This deploy updates every exported Cloud Function, including scheduled and trigger functions."
+echo "This deploys only the six selected backend functions."
+echo "The FCM dispatcher (dispatchMohallaFlowPush) is deliberately excluded;"
+echo "native OS push notifications remain disabled. In-app notification records"
+echo "and emergency escalation automation remain included."
 echo "Deploy Firestore indexes and Rules first; configure App Check before callable use."
 read -r -p "Type DEPLOY MOHALLAFLOW FUNCTIONS to continue: " answer
 [[ "$answer" == "DEPLOY MOHALLAFLOW FUNCTIONS" ]] || { echo "No Functions changed."; exit 0; }
 cd "$ROOT"
-firebase deploy --only functions --project "$PROJECT" --config "$CONFIG"
+firebase deploy --only \
+  functions:notifyEmergencySOSCreated,\
+functions:notifyEmergencySOSUpdated,\
+functions:escalateUnacknowledgedEmergencyAlerts,\
+functions:claimResidentRegistration,\
+functions:requestAccountDeletion,\
+functions:approveColonyPayrollRun \
+  --project "$PROJECT" \
+  --config "$CONFIG"
 echo "[SUCCESS] Functions deploy command completed."
