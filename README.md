@@ -298,3 +298,7 @@ Include relevant test evidence in pull requests. Do not submit local Firebase bi
 No open-source licence has been granted in this repository. The repository is a public code showcase, not an open-source grant. Publication does not grant permission to reuse, modify, redistribute or commercially deploy the original project code or brand assets.
 
 Third-party dependencies and components remain subject to their respective licences. Ownership and redistribution rights for all original and third-party assets must be reviewed before any future open-source licence is assigned.
+
+## Firebase deployment
+
+The reviewed Firestore Rules/indexes, read-only production membership preflight, index-readiness gate, Rules release verification and separate Functions deployment script are in [release/README.md](release/README.md). Use the isolated commands there; do not run an unscoped Firebase deployment from the app root.
