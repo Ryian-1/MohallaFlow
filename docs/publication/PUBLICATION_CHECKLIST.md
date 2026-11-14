@@ -53,14 +53,14 @@ The first workflow run on the publication commit exposed an incorrect CI boundar
 - [x] GitHub Actions updated to `actions/checkout@v7` and `actions/setup-node@v7`; the seven-job run above passed with these versions.
 - [x] A payroll-only test rules fixture is generated temporarily inside the CI runner and removed at job exit. It is not Candidate G and is not a production ruleset.
 
-The public workflow covers Flutter format, analysis and unit/widget tests; Cloud Functions lint/unit tests; dependency audits; full-history secret scanning; recursive OSV scanning; and the narrow payroll Flutter SDK Emulator integration. The broader Firestore authorization suites that require the private Candidate G rules remain maintainer-only. Do not add private or production rules to the public repository to make those suites pass.
+The public workflow covers Flutter format, analysis and unit/widget tests; Cloud Functions lint/unit tests; dependency audits; full-history secret scanning; recursive OSV scanning; release-package integrity; and the payroll Flutter SDK Emulator integration. The exact release Rules candidate is present under `release/firestore/`; its six-suite, 122-test authorization result was produced in private Emulator CI. Other private QA fixtures and production runtime configuration remain excluded. Do not add live production credentials or resident data to the public repository.
 
 [View GitHub Actions](https://github.com/Ryian-1/MohallaFlow/actions)
 
 ## 4. Checks still requiring fresh evidence
 
-- [x] Online `npm audit --audit-level=moderate` passed for `functions/package-lock.json` and `firestore-rules-tests/package-lock.json` in public GitHub Actions run [43381104036](https://github.com/Ryian-1/MohallaFlow/actions/runs/43381104036), 13 November 2026. No moderate-or-higher npm advisories were reported at scan time.
-- [x] Recursive OSV-Scanner completed successfully against supported dependency manifests/lockfiles in the public repository in the same run; no findings were reported at scan time.
+- [x] Online `npm audit --audit-level=moderate` passed for `functions/package-lock.json` and `firestore-rules-tests/package-lock.json` in public GitHub Actions run [43553930997](https://github.com/Ryian-1/MohallaFlow/actions/runs/43553930997), 14 November 2026. No moderate-or-higher npm advisories were reported at scan time.
+- [x] Recursive OSV-Scanner completed successfully against supported dependency manifests/lockfiles in the same run; no findings were reported at scan time.
 - [x] Gitleaks completed successfully against the full public Git history in the same run. This scan does not replace triage of any separate GitHub Secret Scanning alert.
 - [x] Flutter payroll callable SDK integration passed on an Android Emulator with local Auth, Firestore and Functions Emulators, using synthetic test data and a temporary payroll-only rules fixture.
 - [x] A fresh GitHub-hosted checkout completed all seven CI jobs, including Flutter, Functions, security scans, release integrity and payroll SDK emulator integration.
