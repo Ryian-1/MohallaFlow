@@ -64,7 +64,7 @@ const List<RoleScenario> scenarios = [
 ];
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
     'Authenticated sessions resolve all four roles and open their real dashboards',
@@ -108,6 +108,14 @@ void main() {
       firestore.settings = const Settings(persistenceEnabled: false);
 
       await auth.signOut();
+
+      var screenshotSurfaceReady = false;
+      const dashboardScreenshotNames = <RoleCase, String>{
+        RoleCase.admin: '01-admin-dashboard',
+        RoleCase.resident: '02-resident-dashboard',
+        RoleCase.cleanlinessManager: '03-cleanliness-manager-dashboard',
+        RoleCase.worker: '04-worker-dashboard',
+      };
 
       for (final scenario in scenarios) {
         await tester.pumpWidget(const SizedBox.shrink());
@@ -177,6 +185,19 @@ void main() {
           findsNothing,
           reason: 'A dashboard data stream failed for ${scenario.role}.',
         );
+
+        // Convert once on Android, then capture the actual rendered dashboard
+        // while authenticated as each synthetic role in the demo Firebase project.
+        if (!screenshotSurfaceReady) {
+          await binding.convertFlutterSurfaceToImage();
+          await tester.pump();
+          screenshotSurfaceReady = true;
+        }
+        final screenshotName = dashboardScreenshotNames[scenario.role];
+        if (screenshotName == null) {
+          fail('Missing publication screenshot name for ${scenario.role}.');
+        }
+        await binding.takeScreenshot(screenshotName);
 
         // Unmount before signing out so every role's stream subscriptions are
         // disposed before the next authenticated session is created.

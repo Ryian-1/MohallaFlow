@@ -193,7 +193,7 @@ See:
 - [Firebase configuration quickstart](docs/firebase/CONFIGURATION_QUICKSTART.md)
 - [Firebase configuration policy](docs/firebase/FIREBASE_CONFIGURATION_POLICY.md)
 
-Do not deploy Firestore rules from this repository. The supplied QA candidate is not a production ruleset.
+Do not use an unscoped or generic Firebase deployment command from the app root. The SHA-pinned Firestore package under `release/firestore/` is a controlled deployment candidate, not automatic production approval. Use only the staged procedure in [release/README.md](release/README.md), and do not proceed while its legacy-client compatibility gate remains unresolved.
 
 ## Local development
 
