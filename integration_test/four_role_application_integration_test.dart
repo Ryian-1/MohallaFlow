@@ -64,8 +64,7 @@ const List<RoleScenario> scenarios = [
 ];
 
 void main() {
-  final binding =
-      IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
     'Authenticated sessions resolve all four roles and open their real dashboards',
