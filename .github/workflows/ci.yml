@@ -179,6 +179,13 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: functions/package-lock.json
+      - name: Set up Java for Firestore Emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install pinned Firebase CLI
+        run: npm install --global firebase-tools@15.34.2
       - name: Install locked dependencies
         run: npm ci --prefix functions
       - name: Syntax / lint check
@@ -188,6 +195,13 @@ jobs:
           npm run --prefix functions test:resident-registration
           npm run --prefix functions test:app-check
           npm run --prefix functions test:worker-private-migration
+      - name: Payroll backend tests against isolated Firestore Emulator
+        run: |
+          firebase emulators:exec \
+            --only firestore \
+            --project demo-mohallaflow \
+            --config release/firestore/firebase.json \
+            "npm --prefix functions run test:payroll"
 
   release-package-validation:
     name: Production release package integrity
