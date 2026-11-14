@@ -4,7 +4,7 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
-for executable in node firebase flutter python3 shasum; do
+for executable in node firebase flutter python3 sha256sum; do
   command -v "$executable" >/dev/null 2>&1 || {
     echo "[STOP] Required command not found: $executable" >&2
     exit 2
@@ -19,18 +19,19 @@ NODE_VERSION="$(node -p 'process.versions.node')"
 
 RULES_FILE="$ROOT/release/firestore/firestore.rules"
 EXPECTED_RULES_SHA="c5172f7b37059687f4545af60787eb383e5c8f1c0f79572e3ae5e975915899ed"
-ACTUAL_RULES_SHA="$(shasum -a 256 "$RULES_FILE" | awk '{print $1}')"
+ACTUAL_RULES_SHA="$(sha256sum "$RULES_FILE" | awk '{print $1}')"
 [[ "$ACTUAL_RULES_SHA" == "$EXPECTED_RULES_SHA" ]] || {
   echo "[STOP] Firestore Emulator rules SHA does not match the reviewed candidate." >&2
   exit 3
 }
 
 RUN_ID="${GITHUB_RUN_ID:-local-$$}"
-CONFIG_FILE="$(mktemp "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/mohallaflow-four-role-${RUN_ID}.XXXXXX.json")"
-COMMAND_FILE="$(mktemp "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/mohallaflow-four-role-${RUN_ID}.XXXXXX.sh")"
+WORK_DIR="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/mohallaflow-four-role-${RUN_ID}.XXXXXX")"
+CONFIG_FILE="$WORK_DIR/firebase.json"
+COMMAND_FILE="$WORK_DIR/run.sh"
 
 cleanup_files() {
-  rm -f "$CONFIG_FILE" "$COMMAND_FILE"
+  rm -rf "$WORK_DIR"
 }
 trap cleanup_files EXIT
 
