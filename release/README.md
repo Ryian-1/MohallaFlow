@@ -58,9 +58,11 @@ After Firestore indexes and Rules are verified:
 bash release/firestore/scripts/deploy-functions.sh
 ```
 
-This installs locked dependencies, reruns Functions lint/unit tests and npm audit, and requires a separate confirmation before deploying Functions only. It does not deploy Hosting or repeat Firestore deployment.
+This installs locked dependencies, reruns Functions lint/unit tests and npm audit, and requires a separate confirmation before deploying **only these six functions**: emergency SOS in-app notification creation/updates, scheduled emergency escalation, resident phone registration linking, account deletion requests, and payroll approval.
 
-The Functions source enforces App Check on deployed callable endpoints. Configure Firebase App Check for Android and iOS before relying on resident phone-link, payroll and account-deletion callables. Scheduled emergency escalation and FCM notification triggers also need Functions deployment and a billing-enabled Firebase project.
+**Native OS push is intentionally left disabled.** The `dispatchMohallaFlowPush` FCM dispatcher is excluded from the deployment command, so this does not turn on device push notifications. Firestore in-app notifications and emergency escalation still work through the included functions.
+
+The included callable endpoints enforce Firebase App Check when deployed. Configure Firebase App Check for Android and iOS before relying on resident phone-link, payroll and account-deletion callables. Scheduled emergency escalation requires a billing-enabled Firebase project and the Firestore index above.
 
 ## Build and publish mobile apps
 
