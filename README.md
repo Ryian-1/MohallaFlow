@@ -8,7 +8,7 @@
 
 MohallaFlow is a Flutter-based residential community and colony-management application. It brings resident issue reporting, central administration, cleanliness operations, maintenance coordination, workforce workflows and community records into one role-based mobile experience.
 
-> **Project status — 13 November 2026:** A curated public code-showcase snapshot has been published to GitHub. The six-job public CI, dependency audits, full-history Gitleaks scan and payroll Flutter SDK Emulator integration pass. This is not a production release. Production Firebase approval, store-distribution signing, live-service acceptance and legal/ownership review remain separate gates.
+> **Project status — 14 November 2026:** The public code-showcase repository and release candidate are available on GitHub. All seven public CI jobs pass on the latest verified run. This is not a production release: legacy-client compatibility, production Firebase deployment and acceptance, a fresh four-role run for the Manager-menu change, store signing, genuine screenshots and legal/ownership review remain open.
 
 ## Product roles
 
@@ -281,7 +281,7 @@ Use the [screenshot capture plan](docs/publication/SCREENSHOT_CAPTURE_PLAN.md) t
 - App Check enforcement must be verified in each target Firebase environment.
 - Live push notification and APNs delivery require separate environment-specific acceptance.
 - iOS distribution signing and App Store packaging remain outstanding.
-- Public GitHub Actions passed all six jobs on 13 November 2026, including the payroll SDK Emulator integration, npm audits, recursive OSV scan and full-history Gitleaks scan. The broader Candidate G authorization suite remains maintainer-only.
+- Public GitHub Actions passed all seven jobs on 14 November 2026, including Flutter checks, Functions tests, the payroll SDK Emulator integration, npm audits, recursive OSV scan, full-history Gitleaks scan and release-package integrity. The broader Candidate G authorization suite remains maintainer-only.
 - Keep dependency advisory scanning and Dependabot enabled; rerun after dependency/lockfile changes.
 - Genuine release screenshots and ownership/licensing review remain outstanding.
 
