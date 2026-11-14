@@ -31,7 +31,7 @@ The preflight uses your active gcloud account and reads all colonies and members
 Run from the repository root:
 
 ```bash
-./release/firestore/scripts/deploy-firestore.sh
+bash release/firestore/scripts/deploy-firestore.sh
 ```
 
 The script confirms the project and exact source hashes, runs the read-only census, and stops if any active account is incompatible. After you type `DEPLOY MOHALLAFLOW FIRESTORE`, it runs:
@@ -55,7 +55,7 @@ If the census is blocked, fix data and rerun. If Firebase rejects the compiled R
 After Firestore indexes and Rules are verified:
 
 ```bash
-./release/firestore/scripts/deploy-functions.sh
+bash release/firestore/scripts/deploy-functions.sh
 ```
 
 This installs locked dependencies, reruns Functions lint/unit tests and npm audit, and requires a separate confirmation before deploying Functions only. It does not deploy Hosting or repeat Firestore deployment.
