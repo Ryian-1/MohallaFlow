@@ -22,7 +22,7 @@ PY
 # The FCM dispatcher is intentionally not deployed. Also refuse to continue
 # when an older deployment of that function is still active.
 EXISTING_PUSH_DISPATCHER="$(
-  gcloud functions list --gen2 --project "$PROJECT" \
+  gcloud functions list --v2 --project "$PROJECT" \
     --filter="name:dispatchMohallaFlowPush" --format="value(name)"
 )"
 if [[ -n "$EXISTING_PUSH_DISPATCHER" ]]; then
