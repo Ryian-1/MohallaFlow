@@ -123,6 +123,8 @@ def main():
         for f in concurrent.futures.as_completed(futures):
             b,w=f.result();blockers.extend(b);warnings.extend(w)
     active=sum(1 for _,d in members if data(d).get("status")=="active")
+    if active == 0:
+        raise RuntimeError("No canonical active memberships found; refusing to treat an empty access census as compatible.")
     report={"project":PROJECT,"database":"(default)","gcloud_account":account,
       "scanned_at_utc":datetime.now(timezone.utc).isoformat(),"rules_sha256":RULES_SHA,"indexes_sha256":INDEX_SHA,
       "colonies_scanned":len(colonies),"membership_documents_scanned":len(members),"active_memberships_scanned":active,
