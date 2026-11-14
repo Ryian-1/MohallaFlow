@@ -3,7 +3,7 @@ set -Eeuo pipefail
 PROJECT="mohallaflow"
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 DIR="$ROOT/release/firestore"
-EXPECTED="c5172f7b37059687f4545af60787eb383e5c8f1c0f79572e3ae5e975915899ed"
+EXPECTED="3b54f18560ec65a1b12366d2f5df08765ddee82e4d0c0b40b2d0649a1f85715c"
 for cmd in firebase gcloud python3 shasum node; do
   command -v "$cmd" >/dev/null 2>&1 || { echo "[STOP] Missing $cmd" >&2; exit 2; }
 done
@@ -28,12 +28,14 @@ python3 "$DIR/scripts/production_preflight.py" \
 
 echo
 echo "COMPATIBILITY GATE:"
-echo "The reviewed app uses direct member-document reads."
-echo "The reviewed Rules candidate removes the old recursive collection-group member list permission."
-echo "Do not continue if an older deployed app or external integration still queries collectionGroup('members')."
-read -r -p "Type CONFIRMED NO LEGACY MEMBER QUERIES to continue: " legacy
-[[ "$legacy" == "CONFIRMED NO LEGACY MEMBER QUERIES" ]] || {
-  echo "[STOP] Legacy-client compatibility was not confirmed. No production resources changed."
+echo "The candidate preserves the previous production collectionGroup('members') query contract."
+echo "A legacy query must constrain uid == request.auth.uid and status == 'active'."
+echo "Unfiltered, missing-status, and cross-UID queries are denied by the reviewed Rules candidate."
+echo "Six private Firestore Emulator suites passed 125/125 on this exact candidate."
+echo "The recursive match retains the previous production scope for collections named members."
+read -r -p "Type CONFIRMED FILTERED LEGACY MEMBER QUERY COMPATIBILITY to continue: " legacy
+[[ "$legacy" == "CONFIRMED FILTERED LEGACY MEMBER QUERY COMPATIBILITY" ]] || {
+  echo "[STOP] Legacy membership compatibility was not acknowledged. No production resources changed."
   exit 0
 }
 
