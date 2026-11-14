@@ -13,9 +13,9 @@ This document distinguishes the published source snapshot, locally completed eng
 - [x] Initial publication commit is an independent root commit with zero parents; previous private Git history was not pushed.
 - [x] 503 tracked files were published in the initial snapshot.
 - [x] Exact staged publication snapshot was scanned with Gitleaks: approximately 5.47 MB scanned, no leaks found.
-- [x] Remote Git tree was checked after push; no `.rules` files or matching Firebase credential/configuration files were present.
-- [x] Firebase/Firestore/Storage security rules, runtime Firebase configuration, credentials, environment secrets and signing keys were excluded. Clearly labelled example templates remain.
-- [x] No Firebase production deployment was performed or authorized.
+- [x] Runtime Firebase configuration, credentials, environment secrets and signing keys are excluded. Clearly labelled example templates remain.
+- [x] The release branch includes a SHA-pinned Firestore Rules deployment candidate under `release/firestore/`; it is not a deployed production configuration.
+- [x] No production Firestore Rules, indexes or Cloud Functions have been deployed.
 
 ## 2. Verified local engineering evidence
 
@@ -47,23 +47,23 @@ The first workflow run on the publication commit exposed an incorrect CI boundar
 - [x] The original Functions job failed only at its subsequent Emulator step because its runner requires the deliberately excluded private Candidate G rules file.
 - [x] The original Firestore job failed because the private Candidate G rules file is deliberately absent from the public repository.
 - [x] Public CI workflow corrected to run checks that can execute from the public snapshot without private security rules or production Firebase configuration.
-- [x] All six public GitHub Actions jobs passed on 13 November 2026, run [43381104036](https://github.com/Ryian-1/MohallaFlow/actions/runs/43381104036), commit `081fc0a82cc9464cfb5664c0494818825022c177`.
+- [x] All seven public GitHub Actions jobs passed on 14 November 2026, run [43553930997](https://github.com/Ryian-1/MohallaFlow/actions/runs/43553930997), release-branch head `d65d579bf190bb7e2da05ebf6ff2dc6d296153e1`.
 - [x] Flutter format, static analysis, unit/widget tests, Cloud Functions lint/unit tests, npm audits, recursive OSV scan and full-history Gitleaks scan passed.
 - [x] Flutter payroll callable SDK integration passed on an Android Emulator against Auth, Firestore and Functions Emulators using synthetic data.
-- [x] GitHub Actions updated to `actions/checkout@v7` and `actions/setup-node@v7`; the six-job run above passed with these versions.
+- [x] GitHub Actions updated to `actions/checkout@v7` and `actions/setup-node@v7`; the seven-job run above passed with these versions.
 - [x] A payroll-only test rules fixture is generated temporarily inside the CI runner and removed at job exit. It is not Candidate G and is not a production ruleset.
 
-The public workflow covers Flutter format, analysis and unit/widget tests; Cloud Functions lint/unit tests; dependency audits; full-history secret scanning; recursive OSV scanning; and the narrow payroll Flutter SDK Emulator integration. The broader Firestore authorization suites that require the private Candidate G rules remain maintainer-only. Do not add private or production rules to the public repository to make those suites pass.
+The public workflow covers Flutter format, analysis and unit/widget tests; Cloud Functions lint/unit tests; dependency audits; full-history secret scanning; recursive OSV scanning; release-package integrity; and the payroll Flutter SDK Emulator integration. The exact release Rules candidate is present under `release/firestore/`; its six-suite, 122-test authorization result was produced in private Emulator CI. Other private QA fixtures and production runtime configuration remain excluded. Do not add live production credentials or resident data to the public repository.
 
 [View GitHub Actions](https://github.com/Ryian-1/MohallaFlow/actions)
 
 ## 4. Checks still requiring fresh evidence
 
-- [x] Online `npm audit --audit-level=moderate` passed for `functions/package-lock.json` and `firestore-rules-tests/package-lock.json` in public GitHub Actions run [43381104036](https://github.com/Ryian-1/MohallaFlow/actions/runs/43381104036), 13 November 2026. No moderate-or-higher npm advisories were reported at scan time.
-- [x] Recursive OSV-Scanner completed successfully against supported dependency manifests/lockfiles in the public repository in the same run; no findings were reported at scan time.
+- [x] Online `npm audit --audit-level=moderate` passed for `functions/package-lock.json` and `firestore-rules-tests/package-lock.json` in public GitHub Actions run [43553930997](https://github.com/Ryian-1/MohallaFlow/actions/runs/43553930997), 14 November 2026. No moderate-or-higher npm advisories were reported at scan time.
+- [x] Recursive OSV-Scanner completed successfully against supported dependency manifests/lockfiles in the same run; no findings were reported at scan time.
 - [x] Gitleaks completed successfully against the full public Git history in the same run. This scan does not replace triage of any separate GitHub Secret Scanning alert.
 - [x] Flutter payroll callable SDK integration passed on an Android Emulator with local Auth, Firestore and Functions Emulators, using synthetic test data and a temporary payroll-only rules fixture.
-- [x] A fresh GitHub-hosted checkout completed all six CI jobs, including Flutter and Functions tests.
+- [x] A fresh GitHub-hosted checkout completed all seven CI jobs, including Flutter, Functions, security scans, release integrity and payroll SDK emulator integration.
 - [ ] Independently verify the contributor setup instructions on a separate maintainer-controlled Mac/Windows environment.
 - [ ] Re-run the broader four-role UI/integration acceptance suite after any application-source changes.
 
@@ -71,8 +71,9 @@ The successful GitHub Actions run is fresh evidence for the checks listed above.
 
 ## 5. Production and deployment blockers — keep unchecked
 
-- [ ] Restructure, independently review and approve the production Firestore rules. The maintainer-local root rules snapshot was previously measured at 384,997 bytes, above Firebase's documented 256 KiB source limit, and remains excluded.
-- [ ] Candidate G was validated in an Emulator environment only. It is not approved for production deployment and is not included in this public repository.
+- [x] A SHA-pinned Firestore Rules candidate and index manifest are included in the release branch; the exact candidate passed six private Emulator suites (122 passed, 0 failed, 0 skipped).
+- [ ] Complete independent production Rules review and compatibility acceptance. Production membership preflight now passes, but older installed app builds or an external integration may exist and their `collectionGroup('members')` usage has not been established.
+- [ ] Deploy the required production Firestore indexes, wait for READY, deploy the reviewed Rules candidate, and verify the exact active Rules release SHA only after the legacy-client compatibility gate is cleared.
 - [ ] Complete a fresh independent Firebase project setup and acceptance test.
 - [ ] Verify production App Check enforcement and Android Play Integrity / Apple App Attest configuration in the intended Firebase projects.
 - [ ] Review Firebase API-key restrictions, IAM, Functions authorization, quotas and environment separation.
@@ -80,7 +81,8 @@ The successful GitHub Actions run is fresh evidence for the checks listed above.
 - [ ] Verify real authentication and critical workflows using synthetic test data in the independent environment.
 - [ ] Complete live push notification and APNs delivery verification only if push notifications are enabled for the release.
 - [ ] Prepare signed Android and iOS distribution builds and complete device acceptance testing.
-- [ ] Do not deploy Firebase rules or Functions as part of GitHub publication. Production deployment requires separate explicit authorization.
+- [ ] Deploy the six allowlisted Cloud Functions only after Firestore indexes and Rules are successfully deployed and verified. Native OS push dispatcher remains excluded by design.
+- [ ] Complete production acceptance on controlled pilot accounts before resident rollout.
 
 ## 6. Legal, assets and product presentation
 
@@ -97,8 +99,8 @@ No open-source licence is currently granted in this repository. Public visibilit
 
 ## 7. Release decision
 
-**Current decision: PUBLIC CODE SHOWCASE PUBLISHED; SIX-JOB PUBLIC CI, PAYROLL SDK EMULATOR INTEGRATION AND CURRENT DEPENDENCY/SECRET SCANS PASS; NOT READY FOR PRODUCTION DEPLOYMENT OR STORE RELEASE.**
+**Current decision: PUBLIC CODE SHOWCASE PUBLISHED; SEVEN-JOB PUBLIC CI AND PAYROLL SDK EMULATOR INTEGRATION PASS; NOT READY FOR PRODUCTION DEPLOYMENT OR STORE RELEASE.**
 
-The repository is public and the initial snapshot has an independent clean history. The remote tree contains no Firebase security rules or matching Firebase credential/configuration files. Public CI passes on a fresh GitHub checkout, including Flutter checks, Functions checks, npm advisory audits, recursive OSV scanning, full-history Gitleaks scanning and the narrow payroll SDK Emulator integration. The full Firestore authorization suites requiring private Candidate G remain private.
+The repository is public and the initial snapshot has an independent clean history. The release branch contains the SHA-pinned Firestore deployment candidate, but production Rules/indexes and Functions remain undeployed. Seven public CI jobs pass on a fresh GitHub checkout, including Flutter checks, Functions checks, npm audits, recursive OSV, full-history Gitleaks, release package integrity and payroll SDK Emulator integration. The broader Firestore authorization evidence remains in private Emulator CI.
 
-Production Firestore approval, independent Firebase acceptance, App Check configuration acceptance, distribution signing, legal/ownership approval and authentic screenshots remain open gates. The public payroll SDK Emulator integration is complete; the broader four-role acceptance suite remains a separate private QA gate.
+Production legacy-client compatibility, Firestore deployment and verification, Functions deployment, App Check configuration acceptance, signed Android/iOS distribution, legal/ownership approval, authentic screenshots and a fresh four-role simulator test for the new Manager-menu assertion remain open gates. The public payroll SDK Emulator integration is complete.

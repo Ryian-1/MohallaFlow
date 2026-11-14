@@ -16,12 +16,17 @@ const {
   PayrollApprovalError,
 } = require('../lib/payroll');
 
+const PROJECT_ID = 'demo-mohallaflow';
+
 if (!process.env.FIRESTORE_EMULATOR_HOST) {
   throw new Error('Payroll backend tests must run against the Firestore Emulator.');
 }
+if (process.env.GCLOUD_PROJECT && process.env.GCLOUD_PROJECT !== PROJECT_ID) {
+  throw new Error(`Payroll backend tests are restricted to the ${PROJECT_ID} emulator project.`);
+}
 
 const app = initializeApp(
-  { projectId: 'mohallaflow' },
+  { projectId: PROJECT_ID },
   `payroll-backend-tests-${process.pid}`,
 );
 const db = getFirestore(app);

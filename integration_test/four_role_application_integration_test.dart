@@ -21,6 +21,10 @@ const String password = 'MohallaFlow-Integration-2026!';
 const String householdId = 'household-four-role';
 const String residentId = 'resident-four-role';
 const String workerId = 'worker-four-role';
+const String firebaseEmulatorHost = String.fromEnvironment(
+  'FIREBASE_EMULATOR_HOST',
+  defaultValue: '127.0.0.1',
+);
 
 enum RoleCase { admin, resident, cleanlinessManager, worker }
 
@@ -98,9 +102,9 @@ void main() {
       final auth = FirebaseAuth.instance;
       final firestore = FirebaseFirestore.instance;
 
-      await auth.useAuthEmulator('127.0.0.1', 9099);
+      await auth.useAuthEmulator(firebaseEmulatorHost, 9099);
 
-      firestore.useFirestoreEmulator('127.0.0.1', 8080);
+      firestore.useFirestoreEmulator(firebaseEmulatorHost, 8080);
       firestore.settings = const Settings(persistenceEnabled: false);
 
       await auth.signOut();
@@ -378,6 +382,42 @@ Future<void> _exerciseResidentToResolutionJourney({
 
   final acknowledgedComplaint = await complaint.reference.get();
   expect(acknowledgedComplaint.data()?['status'], 'acknowledged');
+
+  // The manager can change operational task status but must not manually
+  // complete a complaint-linked task. The assigned Worker owns the atomic
+  // completion path that also resolves the resident's complaint.
+  final managerTaskCard = find.byKey(
+    ValueKey<String>('cleanliness-task-${task.id}'),
+  );
+  expect(managerTaskCard, findsOneWidget);
+  final managerStatusMenu = find.descendant(
+    of: managerTaskCard,
+    matching: find.byTooltip('Update task status'),
+  );
+  expect(managerStatusMenu, findsOneWidget);
+  expect(
+    find.text(
+      'The assigned worker completes this task to resolve the resident complaint.',
+    ),
+    findsOneWidget,
+  );
+  await tester.tap(managerStatusMenu);
+  await tester.pumpAndSettle();
+  expect(
+    find.widgetWithText(PopupMenuItem<String>, 'Completed'),
+    findsNothing,
+    reason:
+        'Manager must not have a manual completion action for a linked task.',
+  );
+  await tester.binding.handlePopRoute();
+  await tester.pumpAndSettle();
+
+  final managerTaskSnapshot = await task.reference.get();
+  expect(
+    managerTaskSnapshot.data()?['status'],
+    'assigned',
+    reason: 'Opening the manager task menu must not mutate task state.',
+  );
 
   await _endRoleSession(tester, auth);
 

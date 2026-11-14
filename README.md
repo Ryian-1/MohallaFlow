@@ -8,7 +8,7 @@
 
 MohallaFlow is a Flutter-based residential community and colony-management application. It brings resident issue reporting, central administration, cleanliness operations, maintenance coordination, workforce workflows and community records into one role-based mobile experience.
 
-> **Project status — 13 November 2026:** A curated public code-showcase snapshot has been published to GitHub. The six-job public CI, dependency audits, full-history Gitleaks scan and payroll Flutter SDK Emulator integration pass. This is not a production release. Production Firebase approval, store-distribution signing, live-service acceptance and legal/ownership review remain separate gates.
+> **Project status — 14 November 2026:** The public code-showcase repository and release candidate are available on GitHub. All seven public CI jobs pass on the latest verified run. This is not a production release: legacy-client compatibility, production Firebase deployment and acceptance, a fresh four-role run for the Manager-menu change, store signing, genuine screenshots and legal/ownership review remain open.
 
 ## Product roles
 
@@ -138,7 +138,7 @@ The dependency manifests and lockfiles define the exact package versions.
 | iOS app icon catalog | 19 entries valid; marketing icon matches master artwork |
 | Published snapshot security scan | 503 tracked files; approximately 5.47 MB scanned by Gitleaks; zero leaks found |
 
-The four-role integration runner used the iPhone 18 Pro simulator and an isolated demo Firebase project. Functions and Firestore tests also use local emulators and synthetic fixtures. The public GitHub Actions run on 13 November 2026 passed all six jobs, including the Flutter payroll callable SDK integration on an Android Emulator with a temporary payroll-only test rules fixture.
+The four-role integration runner previously passed on the iPhone 18 Pro simulator using an isolated demo Firebase project. The latest public GitHub Actions run on 14 November 2026 passed all seven jobs, including Flutter formatting, analysis and unit/widget tests; Functions tests; npm audits; Gitleaks; recursive OSV scanning; release-package integrity; and the Flutter payroll callable SDK integration on an Android Emulator using synthetic data and a temporary payroll-only test rules fixture. The newly added Manager-menu assertion still needs a fresh four-role simulator run.
 
 The Android release APK generated during verification was approximately 69.7 MB. The unsigned iOS device application build was approximately 57.6 MB.
 
@@ -146,11 +146,11 @@ These results do not establish App Store distribution signing, Play Store public
 
 ## Firestore security status
 
-This public repository intentionally contains **no Firebase, Firestore or Storage security-rule files**. The production rules and the privately retained Emulator QA candidate are excluded from the public Git tree and its history.
+This release branch includes a SHA-256-pinned Firestore deployment candidate at `release/firestore/firestore.rules`, its exact index manifest and isolated deployment scripts. The candidate passed six private Firestore Emulator suites (122 passed, 0 failed, 0 skipped). Emulator validation is not production approval.
 
-The maintainer's Candidate G has passed targeted authorization/attendance checks and the extended isolated Emulator suite in a private QA workspace. It is Emulator-validated only, is not included in this repository and is not approved for production deployment.
+The deployment script performs a read-only production membership census, deploys indexes before Rules, waits for required indexes to become READY, and verifies the active Rules release hash. It also contains a manual legacy-client compatibility gate because the candidate removes the former recursive `collectionGroup('members')` self-list permission.
 
-Do not add private rules to the public repository to make CI pass. Do not deploy any rules or replace production rules without a separate independent review, full authorization acceptance and explicit deployment approval.
+**Production Rules deployment is on hold.** The membership census now passes, but the owner has confirmed older app builds or an external integration may exist and their membership-query behavior has not been established. Do not bypass that gate, weaken Rules to work around a permission error, or run an unscoped `firebase deploy`. See [release/README.md](release/README.md) for the controlled deployment sequence.
 
 ## Requirements
 
@@ -281,7 +281,7 @@ Use the [screenshot capture plan](docs/publication/SCREENSHOT_CAPTURE_PLAN.md) t
 - App Check enforcement must be verified in each target Firebase environment.
 - Live push notification and APNs delivery require separate environment-specific acceptance.
 - iOS distribution signing and App Store packaging remain outstanding.
-- Public GitHub Actions passed all six jobs on 13 November 2026, including the payroll SDK Emulator integration, npm audits, recursive OSV scan and full-history Gitleaks scan. The broader Candidate G authorization suite remains maintainer-only.
+- Public GitHub Actions passed all seven jobs on 14 November 2026, including Flutter checks, Functions tests, the payroll SDK Emulator integration, npm audits, recursive OSV scan, full-history Gitleaks scan and release-package integrity. The broader Candidate G authorization suite remains maintainer-only.
 - Keep dependency advisory scanning and Dependabot enabled; rerun after dependency/lockfile changes.
 - Genuine release screenshots and ownership/licensing review remain outstanding.
 
@@ -298,3 +298,7 @@ Include relevant test evidence in pull requests. Do not submit local Firebase bi
 No open-source licence has been granted in this repository. The repository is a public code showcase, not an open-source grant. Publication does not grant permission to reuse, modify, redistribute or commercially deploy the original project code or brand assets.
 
 Third-party dependencies and components remain subject to their respective licences. Ownership and redistribution rights for all original and third-party assets must be reviewed before any future open-source licence is assigned.
+
+## Firebase deployment
+
+The reviewed Firestore Rules/indexes, read-only production membership preflight, index-readiness gate, Rules release verification and separate Functions deployment script are in [release/README.md](release/README.md). Use the isolated commands there; do not run an unscoped Firebase deployment from the app root.

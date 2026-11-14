@@ -143,3 +143,9 @@ firebase-debug.log
 # Temporary private, emulator-only payroll integration fixtures
 /.firestore-payroll-sdk-qa-*.rules
 /.firebase-payroll-sdk-qa-*.json
+# Local MohallaFlow production-release preflight reports
+release/firestore/reports/
+release/firestore/scripts/__pycache__/
+# Local MohallaFlow production-release preflight reports
+release/firestore/reports/
+release/firestore/scripts/__pycache__/
