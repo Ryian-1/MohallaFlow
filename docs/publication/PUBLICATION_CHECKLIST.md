@@ -1,6 +1,6 @@
 # MohallaFlow — Public Snapshot and Release Checklist
 
-**Review date:** 13 November 2026  
+**Review date:** 14 November 2026  
 **Publication status:** Public code-showcase snapshot published; **not production-ready**.
 
 This document distinguishes the published source snapshot, locally completed engineering evidence, public CI, and the separate requirements for a production colony deployment. Emulator test success is not production approval. An unsigned iOS build is not App Store distribution readiness.
@@ -71,9 +71,10 @@ The successful GitHub Actions run is fresh evidence for the checks listed above.
 
 ## 5. Production and deployment blockers — keep unchecked
 
-- [x] A SHA-pinned Firestore Rules candidate and index manifest are included in the release branch; the exact candidate passed six private Emulator suites (122 passed, 0 failed, 0 skipped).
-- [ ] Complete independent production Rules review and compatibility acceptance. Production membership preflight now passes, but older installed app builds or an external integration may exist and their `collectionGroup('members')` usage has not been established.
-- [ ] Deploy the required production Firestore indexes, wait for READY, deploy the reviewed Rules candidate, and verify the exact active Rules release SHA only after the legacy-client compatibility gate is cleared.
+- [x] A SHA-pinned Firestore Rules candidate and index manifest are included in the release branch; the exact candidate passed six private Emulator suites (125 passed, 0 failed, 0 skipped).
+- [x] Legacy filtered membership-query compatibility is preserved: the candidate keeps the previous `uid == request.auth.uid` and `status == 'active'` query contract; unfiltered, missing-status and cross-UID queries are denied in Emulator tests.
+- [ ] Complete an independent production Rules review, including acceptance of the historical recursive `members` collection scope.
+- [ ] Deploy the required production Firestore indexes, wait for READY, deploy the reviewed Rules candidate, and verify the exact active Rules release SHA.
 - [ ] Complete a fresh independent Firebase project setup and acceptance test.
 - [ ] Verify production App Check enforcement and Android Play Integrity / Apple App Attest configuration in the intended Firebase projects.
 - [ ] Review Firebase API-key restrictions, IAM, Functions authorization, quotas and environment separation.
@@ -103,4 +104,4 @@ No open-source licence is currently granted in this repository. Public visibilit
 
 The repository is public and the initial snapshot has an independent clean history. The release branch contains the SHA-pinned Firestore deployment candidate, but production Rules/indexes and Functions remain undeployed. Seven public CI jobs pass on a fresh GitHub checkout, including Flutter checks, Functions checks, npm audits, recursive OSV, full-history Gitleaks, release package integrity and payroll SDK Emulator integration. The broader Firestore authorization evidence remains in private Emulator CI.
 
-Production legacy-client compatibility, Firestore deployment and verification, Functions deployment, App Check configuration acceptance, signed Android/iOS distribution, legal/ownership approval, authentic screenshots and a fresh four-role simulator test for the new Manager-menu assertion remain open gates. The public payroll SDK Emulator integration is complete.
+Firestore deployment and verification, Functions deployment, App Check configuration acceptance, signed Android/iOS distribution, legal/ownership approval, authentic screenshots and a fresh four-role simulator test for the new Manager-menu assertion remain open gates. Legacy filtered membership compatibility is preserved and Emulator-tested. The public payroll SDK Emulator integration is complete.
