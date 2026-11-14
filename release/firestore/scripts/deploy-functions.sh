@@ -22,6 +22,7 @@ npm ci --prefix "$ROOT/functions"
 npm run --prefix "$ROOT/functions" lint
 npm run --prefix "$ROOT/functions" test:resident-registration
 npm run --prefix "$ROOT/functions" test:app-check
+npm run --prefix "$ROOT/functions" test:payroll
 npm run --prefix "$ROOT/functions" test:worker-private-migration
 npm audit --prefix "$ROOT/functions" --audit-level=moderate
 echo "This deploy updates every exported Cloud Function, including scheduled and trigger functions."
