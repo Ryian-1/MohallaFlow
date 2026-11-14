@@ -107,11 +107,47 @@ echo "========== SEED FOUR SYNTHETIC ROLE ACCOUNTS =========="
 node functions/test/four-role-app.seed.js seed
 
 echo
-echo "========== RUN FOUR-ROLE ANDROID APPLICATION ACCEPTANCE =========="
-flutter test integration_test/four_role_application_integration_test.dart \
+echo "========== RUN FOUR-ROLE ANDROID APPLICATION ACCEPTANCE + SCREEN CAPTURE =========="
+mkdir -p build/publication_screenshots
+flutter drive \
+  --driver=test_driver/four_role_screenshot_driver.dart \
+  --target=integration_test/four_role_application_integration_test.dart \
   --device-id emulator-5554 \
-  --reporter expanded \
   --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2
+
+python3 - <<'PY'
+from pathlib import Path
+import struct
+import sys
+
+root = Path("build/publication_screenshots")
+expected = {
+    "01-admin-dashboard.png",
+    "02-resident-dashboard.png",
+    "03-cleanliness-manager-dashboard.png",
+    "04-worker-dashboard.png",
+}
+found = {path.name for path in root.glob("*.png")}
+missing = sorted(expected - found)
+extra = sorted(found - expected)
+if missing or extra:
+    print(f"[STOP] Screenshot set mismatch. Missing: {missing}; unexpected: {extra}", file=sys.stderr)
+    sys.exit(1)
+
+for name in sorted(expected):
+    path = root / name
+    raw = path.read_bytes()
+    if len(raw) < 10_000 or not raw.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+        print(f"[STOP] Invalid or unexpectedly small screenshot: {name}", file=sys.stderr)
+        sys.exit(1)
+    width, height = struct.unpack(">II", raw[16:24])
+    if width < 320 or height < 480:
+        print(f"[STOP] Screenshot dimensions are too small: {name} ({width}x{height})", file=sys.stderr)
+        sys.exit(1)
+    print(f"[SCREENSHOT] {name}: {width}x{height}, {len(raw)} bytes")
+
+print("[PASS] Four authentic role-dashboard screenshots captured from the running application.")
+PY
 
 echo "[PASS] Four-role UI integration completed against demo-mohallaflow."
 COMMAND
