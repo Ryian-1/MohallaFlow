@@ -302,3 +302,7 @@ Third-party dependencies and components remain subject to their respective licen
 ## Firebase deployment
 
 The reviewed Firestore Rules/indexes, read-only production membership preflight, index-readiness gate, Rules release verification and separate Functions deployment script are in [release/README.md](release/README.md). Use the isolated commands there; do not run an unscoped Firebase deployment from the app root.
+
+## Firebase deployment
+
+The reviewed Firestore Rules/indexes, read-only production membership preflight, index-readiness gate, Rules release verification and separate Functions deployment script are in [release/README.md](release/README.md). Use the isolated commands there; do not run an unscoped Firebase deployment from the app root.
