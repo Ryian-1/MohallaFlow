@@ -65,8 +65,7 @@ const List<RoleScenario> scenarios = [
 
 void main() {
   final binding =
-      IntegrationTestWidgetsFlutterBinding.ensureInitialized()
-          as IntegrationTestWidgetsFlutterBinding;
+      IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
     'Authenticated sessions resolve all four roles and open their real dashboards',
@@ -199,7 +198,7 @@ void main() {
         if (screenshotName == null) {
           fail('Missing publication screenshot name for ${scenario.role}.');
         }
-        await binding.takeScreenshot(screenshotName!);
+        await binding.takeScreenshot(screenshotName);
 
         // Unmount before signing out so every role's stream subscriptions are
         // disposed before the next authenticated session is created.
