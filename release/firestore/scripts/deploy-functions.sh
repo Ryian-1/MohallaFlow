@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 PROJECT="mohallaflow"
+EMULATOR_PROJECT="demo-mohallaflow"
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 for cmd in firebase gcloud node npm; do
   command -v "$cmd" >/dev/null 2>&1 || { echo "[STOP] Missing $cmd" >&2; exit 2; }
@@ -11,6 +12,8 @@ NODE="$(node --version)"
 CONFIG="$ROOT/firebase.json"
 [[ -f "$CONFIG" ]] || CONFIG="$ROOT/firebase.json.example"
 [[ -f "$CONFIG" ]] || { echo "[STOP] Firebase config missing." >&2; exit 2; }
+EMULATOR_CONFIG="$ROOT/release/firestore/firebase.json"
+[[ -f "$EMULATOR_CONFIG" ]] || { echo "[STOP] Isolated Firestore Emulator config missing: $EMULATOR_CONFIG" >&2; exit 2; }
 python3 - "$CONFIG" <<'PY'
 import json,sys
 with open(sys.argv[1],encoding="utf-8") as f:c=json.load(f)
@@ -38,11 +41,16 @@ npm ci --prefix "$ROOT/functions"
 npm run --prefix "$ROOT/functions" lint
 npm run --prefix "$ROOT/functions" test:resident-registration
 npm run --prefix "$ROOT/functions" test:app-check
-npm run --prefix "$ROOT/functions" test:payroll
+echo "[CHECK] Running payroll backend tests in an isolated local Firestore Emulator ($EMULATOR_PROJECT)..."
+firebase emulators:exec \
+  --only firestore \
+  --project "$EMULATOR_PROJECT" \
+  --config "$EMULATOR_CONFIG" \
+  "npm --prefix \"$ROOT/functions\" run test:payroll"
 npm run --prefix "$ROOT/functions" test:worker-private-migration
 npm audit --prefix "$ROOT/functions" --audit-level=moderate
 echo "This deploys only the six selected backend functions."
-echo "The FCM dispatcher (dispatchMohallaFlowPush) is deliberately excluded from this deploy."
+echo "The FCM dispatcher (dispatchMohallaFlowPush) is deliberately excluded from the deploy."
 echo "This does NOT delete or disable a dispatcher that may already be deployed."
 echo "Check 'firebase functions:list --project $PROJECT' and stop if it is present."
 echo "In-app notification records and emergency escalation remain included."
