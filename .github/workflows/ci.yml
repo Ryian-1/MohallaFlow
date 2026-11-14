@@ -167,6 +167,33 @@ jobs:
           emulator-boot-timeout: 900
           script: bash tool/payroll_sdk_integration/run_ci.sh
 
+  firestore-membership-compatibility:
+    name: Firestore legacy membership compatibility Emulator tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Set up Java for Firestore Emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install pinned Firebase CLI
+        run: npm install --global firebase-tools@15.34.2
+      - name: Install locked test dependencies
+        run: npm ci --prefix firestore-rules-tests
+      - name: Run membership authorization tests against the reviewed Rules candidate
+        run: |
+          firebase emulators:exec \
+            --only firestore \
+            --project demo-mohallaflow \
+            --config release/firestore/firebase.json \
+            "npm --prefix firestore-rules-tests test"
+
   functions:
     name: Cloud Functions lint and unit tests
     runs-on: ubuntu-latest
