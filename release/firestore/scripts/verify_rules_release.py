@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify the active production Firestore Rules release source SHA."""
 import argparse,hashlib,json,subprocess,sys,urllib.error,urllib.request
-PROJECT="mohallaflow";EXPECTED="c5172f7b37059687f4545af60787eb383e5c8f1c0f79572e3ae5e975915899ed"
+PROJECT="mohallaflow";EXPECTED="3b54f18560ec65a1b12366d2f5df08765ddee82e4d0c0b40b2d0649a1f85715c"
 def get(url,token):
     req=urllib.request.Request(url,headers={"Authorization":"Bearer "+token,"x-goog-user-project":PROJECT,"Accept":"application/json"})
     try:
