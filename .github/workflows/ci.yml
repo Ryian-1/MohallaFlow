@@ -252,6 +252,14 @@ jobs:
           disable-linux-hw-accel: false
           emulator-boot-timeout: 900
           script: bash tool/four_role_android_integration/run_ci.sh
+      - name: Upload genuine four-role app screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mohallaflow-genuine-app-screenshots
+          path: build/publication_screenshots/*.png
+          if-no-files-found: warn
+          retention-days: 14
 
 
   functions:
