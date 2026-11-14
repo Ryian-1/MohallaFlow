@@ -26,6 +26,17 @@ python3 "$DIR/scripts/production_preflight.py" \
   --indexes "$DIR/firestore.indexes.json" \
   --output "$DIR/reports/production-preflight.json"
 
+echo
+echo "COMPATIBILITY GATE:"
+echo "The reviewed app uses direct member-document reads."
+echo "The reviewed Rules candidate removes the old recursive collection-group member list permission."
+echo "Do not continue if an older deployed app or external integration still queries collectionGroup('members')."
+read -r -p "Type CONFIRMED NO LEGACY MEMBER QUERIES to continue: " legacy
+[[ "$legacy" == "CONFIRMED NO LEGACY MEMBER QUERIES" ]] || {
+  echo "[STOP] Legacy-client compatibility was not confirmed. No production resources changed."
+  exit 0
+}
+
 read -r -p "Type DEPLOY MOHALLAFLOW FIRESTORE to continue: " answer
 [[ "$answer" == "DEPLOY MOHALLAFLOW FIRESTORE" ]] || { echo "No production resources changed."; exit 0; }
 
