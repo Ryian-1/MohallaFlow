@@ -25,9 +25,9 @@ PY
 # The FCM dispatcher is intentionally not deployed. Also refuse to continue
 # when an older deployment of that function is still active.
 EXISTING_PUSH_DISPATCHER="$(
-  gcloud functions list --v2 --project "$PROJECT" \
-    --filter="name:dispatchMohallaFlowPush" --format="value(name)"
-)"
+  gcloud functions list --v2 --project "$PROJECT" --format=json |
+    python3 -c 'import json,sys; rows=json.load(sys.stdin); names=[r.get("name","").rsplit("/",1)[-1] for r in rows if r.get("name","").rsplit("/",1)[-1]=="dispatchMohallaFlowPush"]; print("\\n".join(names))'
+)
 if [[ -n "$EXISTING_PUSH_DISPATCHER" ]]; then
   echo "[STOP] Existing Gen 2 FCM dispatcher detected:" >&2
   echo "$EXISTING_PUSH_DISPATCHER" >&2
@@ -49,6 +49,12 @@ firebase emulators:exec \
   "npm --prefix \"$ROOT/functions\" run test:payroll"
 npm run --prefix "$ROOT/functions" test:worker-private-migration
 npm audit --prefix "$ROOT/functions" --audit-level=moderate
+echo "[CHECK] Verifying Firestore indexes are READY before Functions deployment..."
+python3 "$ROOT/release/firestore/scripts/wait_for_indexes.py" \
+  --timeout "${MOHALLAFLOW_INDEX_WAIT_SECONDS:-3600}" \
+  --interval "${MOHALLAFLOW_INDEX_POLL_SECONDS:-20}"
+echo "[CHECK] Verifying the active production Rules release SHA..."
+python3 "$ROOT/release/firestore/scripts/verify_rules_release.py" --project "$PROJECT"
 echo "This deploys only the six selected backend functions."
 echo "The FCM dispatcher (dispatchMohallaFlowPush) is deliberately excluded from the deploy."
 echo "This does NOT delete or disable a dispatcher that may already be deployed."
