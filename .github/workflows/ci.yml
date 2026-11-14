@@ -188,3 +188,27 @@ jobs:
           npm run --prefix functions test:resident-registration
           npm run --prefix functions test:app-check
           npm run --prefix functions test:worker-private-migration
+
+  release-package-validation:
+    name: Production release package integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Verify release package hashes and script syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release
+          sha256sum -c SHA256SUMS.txt
+          python3 -m json.tool firestore/firebase.json >/dev/null
+          python3 -m json.tool firestore/firestore.indexes.json >/dev/null
+          python3 -m py_compile firestore/scripts/production_preflight.py
+          python3 -m py_compile firestore/scripts/wait_for_indexes.py
+          python3 -m py_compile firestore/scripts/verify_rules_release.py
+          bash -n firestore/scripts/deploy-firestore.sh
+          bash -n firestore/scripts/deploy-functions.sh
+          python3 firestore/scripts/production_preflight.py --help >/dev/null
+          python3 firestore/scripts/wait_for_indexes.py --help >/dev/null
+          python3 firestore/scripts/verify_rules_release.py --help >/dev/null
+          echo "Production deployment package validation passed."
