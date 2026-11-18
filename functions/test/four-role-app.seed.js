@@ -280,7 +280,7 @@ async function seed() {
     .doc('worker-four-role')
     .set({
       fullName: ACCOUNTS[3].name,
-      phoneNumber: '0000000003',
+      phoneNumber: '9876543211',
       assignedArea: 'Block A',
       status: 'active',
       createdBy: admin.uid,
@@ -294,7 +294,7 @@ async function seed() {
     .set({
       bloodGroup: 'O+',
       familyMemberName: 'Integration Emergency Contact',
-      familyMemberPhone: '0000000004',
+      familyMemberPhone: '9876543212',
       consentStatus: 'granted',
       consentAt: now,
       privacyNoticeVersion: 'worker-private-v1',
