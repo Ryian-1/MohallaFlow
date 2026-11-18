@@ -294,8 +294,7 @@ Future<void> _exerciseResidentToResolutionJourney({
   expect(
     residentFields,
     findsNWidgets(5),
-    reason:
-        'Resident complaint form should expose resident name, phone, title, location and description.',
+    reason: 'Resident complaint form should expose resident name, phone, title, location and description.',
   );
   await tester.enterText(
     residentFields.at(0),
