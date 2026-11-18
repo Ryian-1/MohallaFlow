@@ -259,11 +259,18 @@ flutter build ios --release --no-codesign
 
 iOS App Store distribution requires a separate Apple Developer signing and release configuration. A successful unsigned build is not a distribution-ready IPA.
 
-## Screenshots and product media
+## App screenshots
 
-Genuine, sanitised product screenshots have not yet been approved for this publication snapshot. Do not represent mockups as screenshots of the working application.
+These are genuine captures of the running Flutter application, taken from authenticated Admin, Resident, Cleanliness Manager and Worker sessions against the isolated `demo-mohallaflow` Firebase Emulator project. The fixture uses synthetic account names and masked contact values; no production resident data is used.
 
-Use the [screenshot capture plan](docs/publication/SCREENSHOT_CAPTURE_PLAN.md) to prepare authentic Admin, Resident, Cleanliness Manager and Worker visuals.
+<p align="center">
+  <img src="assets/screenshots/01-admin-dashboard.png" alt="MohallaFlow Admin dashboard" width="23%" />
+  <img src="assets/screenshots/02-resident-dashboard.png" alt="MohallaFlow Resident dashboard" width="23%" />
+  <img src="assets/screenshots/03-cleanliness-manager-dashboard.png" alt="MohallaFlow Cleanliness Manager dashboard" width="23%" />
+  <img src="assets/screenshots/04-worker-dashboard.png" alt="MohallaFlow Worker dashboard" width="23%" />
+</p>
+
+The capture procedure and privacy controls are documented in the [screenshot capture plan](docs/publication/SCREENSHOT_CAPTURE_PLAN.md).
 
 ## Security and privacy
 
