@@ -30,6 +30,10 @@ const bool capturePublicationScreenshots = bool.fromEnvironment(
   'MOHALLAFLOW_CAPTURE_PUBLICATION_SCREENSHOTS',
   defaultValue: false,
 );
+const bool publicationScreenshotsOnly = bool.fromEnvironment(
+  'MOHALLAFLOW_SCREENSHOTS_ONLY',
+  defaultValue: false,
+);
 
 enum RoleCase { admin, resident, cleanlinessManager, worker }
 
@@ -225,6 +229,11 @@ void main() {
         // disposed before the next authenticated session is created.
         await tester.pumpWidget(const SizedBox.shrink());
         await auth.signOut();
+      }
+
+      if (publicationScreenshotsOnly) {
+        expect(auth.currentUser, isNull);
+        return;
       }
 
       // Verify worker notification fan-out is presented as one logical event.

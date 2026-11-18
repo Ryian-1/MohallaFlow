@@ -4,6 +4,15 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
+MODE="${1:-acceptance}"
+case "$MODE" in
+  screenshots|acceptance) ;;
+  *)
+    echo "[STOP] Usage: $0 [screenshots|acceptance]" >&2
+    exit 2
+    ;;
+esac
+
 for executable in node firebase flutter python3 sha256sum; do
   command -v "$executable" >/dev/null 2>&1 || {
     echo "[STOP] Required command not found: $executable" >&2
@@ -106,22 +115,24 @@ trap cleanup_fixture EXIT
 echo "========== SEED FOUR SYNTHETIC ROLE ACCOUNTS =========="
 node functions/test/four-role-app.seed.js seed
 
-echo
-echo "========== RUN FOUR-ROLE ACCEPTANCE AND CAPTURE DASHBOARDS =========="
-mkdir -p build/publication_screenshots
-if ! flutter drive \
-  --driver=test_driver/four_role_screenshot_driver.dart \
-  --target=integration_test/four_role_application_integration_test.dart \
-  --device-id emulator-5554 \
-  --no-pub \
-  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2 \
-  --dart-define=MOHALLAFLOW_CAPTURE_PUBLICATION_SCREENSHOTS=true; then
-  echo "[DIAGNOSTIC] Four-role acceptance failed; capturing Android logcat." >&2
-  adb logcat -d -v time -t 1600 || true
-  exit 1
-fi
+if [[ "$MOHALLAFLOW_INTEGRATION_MODE" == "screenshots" ]]; then
+  echo
+  echo "========== CAPTURE FOUR GENUINE ROLE DASHBOARDS =========="
+  mkdir -p build/publication_screenshots
+  if ! flutter drive \
+    --driver=test_driver/four_role_screenshot_driver.dart \
+    --target=integration_test/four_role_application_integration_test.dart \
+    --device-id emulator-5554 \
+    --no-pub \
+    --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2 \
+    --dart-define=MOHALLAFLOW_CAPTURE_PUBLICATION_SCREENSHOTS=true \
+    --dart-define=MOHALLAFLOW_SCREENSHOTS_ONLY=true; then
+    echo "[DIAGNOSTIC] Screenshot capture failed; capturing Android logcat." >&2
+    adb logcat -d -v time -t 1600 || true
+    exit 1
+  fi
 
-python3 - <<'PY'
+  python3 - <<'PY'
 from pathlib import Path
 import struct
 import sys
@@ -155,8 +166,26 @@ for name in sorted(expected):
 print("[PASS] Four authentic role-dashboard screenshots captured from the running application.")
 PY
 
-echo
-echo "[PASS] Four-role UI acceptance passed and all four genuine dashboard screenshots were captured in the same app session."
+  echo "[PASS] Four authentic role dashboards captured and validated."
+elif [[ "$MOHALLAFLOW_INTEGRATION_MODE" == "acceptance" ]]; then
+  echo
+  echo "========== RUN FULL FOUR-ROLE APPLICATION ACCEPTANCE =========="
+  if ! flutter drive \
+    --driver=test_driver/mohallaflow_integration_test_driver.dart \
+    --target=integration_test/four_role_application_integration_test.dart \
+    --device-id emulator-5554 \
+    --no-pub \
+    --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2; then
+    echo "[DIAGNOSTIC] Full four-role acceptance failed; capturing Android logcat." >&2
+    adb logcat -d -v time -t 1600 || true
+    exit 1
+  fi
+
+  echo "[PASS] Full four-role UI workflow completed against the isolated Emulator."
+else
+  echo "[STOP] Unknown integration mode: $MOHALLAFLOW_INTEGRATION_MODE" >&2
+  exit 2
+fi
 
 COMMAND
 
@@ -167,7 +196,10 @@ echo "Node: $NODE_VERSION"
 echo "Project: demo-mohallaflow"
 echo "Rules SHA256: $ACTUAL_RULES_SHA"
 echo "Device: Android Emulator"
+echo "Mode: $MODE"
 echo "Production Firebase is not accessed."
+
+export MOHALLAFLOW_INTEGRATION_MODE="$MODE"
 
 firebase emulators:exec \
   --only auth,firestore \
