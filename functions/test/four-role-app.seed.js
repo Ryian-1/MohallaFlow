@@ -270,7 +270,7 @@ async function seed() {
       householdId: 'household-four-role',
       blockId: 'A',
       houseNumber: 'A-101',
-      phoneNumber: '+910000000002',
+      phoneNumber: '+919876543210',
       email: ACCOUNTS[1].email,
       createdAt: now,
       updatedAt: now,
