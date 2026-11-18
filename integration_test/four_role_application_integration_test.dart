@@ -190,9 +190,11 @@ void main() {
           reason: 'A dashboard data stream failed for ${scenario.role}.',
         );
 
-        // Convert once on Android, then capture the actual rendered dashboard
-        // while authenticated as each synthetic role in the demo Firebase project.
+        // Do not capture the dashboard until its role-specific Firestore
+        // content is actually rendered. A fixed delay alone can produce a
+        // spinner-only screenshot when an Emulator stream is still starting.
         if (captureScreenshotsOnly) {
+          await _waitForScreenshotReadiness(tester, scenario.role);
           if (!screenshotSurfaceReady) {
             await binding.convertFlutterSurfaceToImage();
             await tester.pump();
@@ -1081,6 +1083,41 @@ Future<void> _signInAndOpenRoleDashboard({
 Future<void> _endRoleSession(WidgetTester tester, FirebaseAuth auth) async {
   await tester.pumpWidget(const SizedBox.shrink());
   await auth.signOut();
+  await tester.pump();
+}
+
+Future<void> _waitForScreenshotReadiness(
+  WidgetTester tester,
+  RoleCase role,
+) async {
+  bool ready() {
+    switch (role) {
+      case RoleCase.admin:
+        return find.text('Colony overview').evaluate().isNotEmpty &&
+            find.text('Management modules').evaluate().isNotEmpty;
+      case RoleCase.resident:
+        return find.text('Quick actions').evaluate().isNotEmpty &&
+            find.text('New complaint').evaluate().isNotEmpty &&
+            find.text('My complaints').evaluate().isNotEmpty;
+      case RoleCase.cleanlinessManager:
+        return find.text('Cleaning task register').evaluate().isNotEmpty &&
+            find.text('Integration corridor cleaning task')
+                .evaluate()
+                .isNotEmpty;
+      case RoleCase.worker:
+        return find.text('My cleaning tasks').evaluate().isNotEmpty &&
+            find.text('Integration corridor cleaning task')
+                .evaluate()
+                .isNotEmpty;
+    }
+  }
+
+  await _waitForCondition(
+    tester,
+    ready,
+    'The ${role.name} dashboard did not render its seeded content; refusing to capture a loading placeholder.',
+  );
+  await tester.pump(const Duration(milliseconds: 800));
   await tester.pump();
 }
 
