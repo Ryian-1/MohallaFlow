@@ -1107,7 +1107,8 @@ Future<void> _waitForScreenshotReadiness(
                 .isNotEmpty;
       case RoleCase.worker:
         return find.text('My cleaning tasks').evaluate().isNotEmpty &&
-            find.text('Integration corridor cleaning task')
+            find
+                .text('Integration corridor cleaning task')
                 .evaluate()
                 .isNotEmpty &&
             find
