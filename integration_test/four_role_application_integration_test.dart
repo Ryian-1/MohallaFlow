@@ -1108,7 +1108,12 @@ Future<void> _waitForScreenshotReadiness(
         return find.text('My cleaning tasks').evaluate().isNotEmpty &&
             find.text('Integration corridor cleaning task')
                 .evaluate()
-                .isNotEmpty;
+                .isNotEmpty &&
+            find
+                .textContaining('Loading your personal details')
+                .evaluate()
+                .isEmpty &&
+            find.text('Loading housekeeping jobs...').evaluate().isEmpty;
     }
   }
 
