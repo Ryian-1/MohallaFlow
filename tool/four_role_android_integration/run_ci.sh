@@ -107,14 +107,19 @@ echo "========== SEED FOUR SYNTHETIC ROLE ACCOUNTS =========="
 node functions/test/four-role-app.seed.js seed
 
 echo
-echo "========== CAPTURE FOUR GENUINE ROLE DASHBOARDS =========="
+echo "========== RUN FOUR-ROLE ACCEPTANCE AND CAPTURE DASHBOARDS =========="
 mkdir -p build/publication_screenshots
-flutter drive \
+if ! flutter drive \
   --driver=test_driver/four_role_screenshot_driver.dart \
   --target=integration_test/four_role_application_integration_test.dart \
   --device-id emulator-5554 \
+  --no-pub \
   --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2 \
-  --dart-define=MOHALLAFLOW_SCREENSHOTS_ONLY=true
+  --dart-define=MOHALLAFLOW_CAPTURE_PUBLICATION_SCREENSHOTS=true; then
+  echo "[DIAGNOSTIC] Four-role acceptance failed; capturing Android logcat." >&2
+  adb logcat -d -v time -t 1600 || true
+  exit 1
+fi
 
 python3 - <<'PY'
 from pathlib import Path
@@ -151,19 +156,7 @@ print("[PASS] Four authentic role-dashboard screenshots captured from the runnin
 PY
 
 echo
-echo "========== RUN FULL FOUR-ROLE APPLICATION ACCEPTANCE =========="
-if ! flutter drive \
-  --driver=test_driver/mohallaflow_integration_test_driver.dart \
-  --target=integration_test/four_role_application_integration_test.dart \
-  --device-id emulator-5554 \
-  --no-pub \
-  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2; then
-  echo "[DIAGNOSTIC] Full four-role acceptance failed; capturing Android logcat." >&2
-  adb logcat -d -v time -t 1600 || true
-  exit 1
-fi
-
-echo "[PASS] Full four-role UI workflow completed against the same isolated Emulator instance."
+echo "[PASS] Four-role UI acceptance passed and all four genuine dashboard screenshots were captured in the same app session."
 
 COMMAND
 
