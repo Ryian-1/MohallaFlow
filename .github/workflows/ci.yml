@@ -260,6 +260,16 @@ jobs:
           path: build/publication_screenshots/*.png
           if-no-files-found: warn
           retention-days: 14
+      - name: Run full four-role application acceptance
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          disable-linux-hw-accel: false
+          emulator-boot-timeout: 900
+          script: bash tool/four_role_android_integration/run_acceptance_ci.sh
 
 
   functions:
@@ -318,6 +328,7 @@ jobs:
           bash -n firestore/scripts/deploy-firestore.sh
           bash -n firestore/scripts/deploy-functions.sh
           bash -n ../tool/four_role_android_integration/run_ci.sh
+          bash -n ../tool/four_role_android_integration/run_acceptance_ci.sh
           python3 firestore/scripts/production_preflight.py --help >/dev/null
           python3 firestore/scripts/wait_for_indexes.py --help >/dev/null
           python3 firestore/scripts/verify_rules_release.py --help >/dev/null
