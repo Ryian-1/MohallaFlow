@@ -17,7 +17,7 @@ import 'package:mohalla_flow/widgets/brand_logo.dart';
 
 const String projectId = 'demo-mohallaflow';
 const String colonyId = 'four_role_application_integration';
-const String colonyName = 'MohallaFlow Integration Colony';
+const String colonyName = 'Greenview Residency';
 const String password = 'MohallaFlow-Integration-2026!';
 const String householdId = 'household-four-role';
 const String residentId = 'resident-four-role';
@@ -646,7 +646,7 @@ Future<void> _exerciseMaintenancePaymentJourney({
     'Resident could not open My Maintenance Bills.',
   );
 
-  final billTitle = find.text('Integration maintenance bill');
+  final billTitle = find.text('November maintenance bill');
   await _waitForCondition(
     tester,
     () => billTitle.evaluate().isNotEmpty,
@@ -1118,20 +1118,20 @@ Future<void> _waitForScreenshotReadiness(
         return find.text('CLEANLINESS MANAGEMENT').evaluate().isNotEmpty &&
             find.text('Cleaning task register').evaluate().isNotEmpty &&
             find
-                .text('Integration corridor cleaning task')
+                .text('Block A corridor cleaning')
                 .evaluate()
                 .isNotEmpty;
       case RoleCase.worker:
         return find.text('My cleaning tasks').evaluate().isNotEmpty &&
             find
-                .text('Integration corridor cleaning task')
+                .text('Block A corridor cleaning')
                 .evaluate()
                 .isNotEmpty &&
             find.text('Blood group: O+').evaluate().isNotEmpty &&
             find
                 .text(
                   'Family / emergency contact: '
-                  'Integration Emergency Contact · 9876543212',
+                  'Emergency Contact · 0000000000',
                 )
                 .evaluate()
                 .isNotEmpty &&

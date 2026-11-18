@@ -8,7 +8,7 @@
 
 MohallaFlow is a Flutter-based residential community and colony-management application. It brings resident issue reporting, central administration, cleanliness operations, maintenance coordination, workforce workflows and community records into one role-based mobile experience.
 
-> **Project status — 14 November 2026:** The public code-showcase repository and release candidate are available on GitHub. All seven public CI jobs pass on the latest verified run. This is not a production release: legacy-client compatibility, production Firebase deployment and acceptance, a fresh four-role run for the Manager-menu change, store signing, genuine screenshots and legal/ownership review remain open.
+> **Project status — 18 November 2026:** MohallaFlow is published as a public GitHub code showcase with genuine Admin, Resident, Cleanliness Manager and Worker app screenshots. Its nine-job CI pipeline covers Flutter checks, backend tests, dependency and secret scans, release integrity, payroll SDK integration, screenshot capture and full four-role Android acceptance. This is a portfolio showcase, not a production mobile release: legacy-client compatibility, production Firebase deployment and acceptance, store signing, and legal/ownership review remain separate gates.
 
 ## Product roles
 
@@ -138,7 +138,7 @@ The dependency manifests and lockfiles define the exact package versions.
 | iOS app icon catalog | 19 entries valid; marketing icon matches master artwork |
 | Published snapshot security scan | 503 tracked files; approximately 5.47 MB scanned by Gitleaks; zero leaks found |
 
-The four-role integration runner previously passed on the iPhone 18 Pro simulator using an isolated demo Firebase project. The latest public GitHub Actions run on 14 November 2026 passed all seven jobs, including Flutter formatting, analysis and unit/widget tests; Functions tests; npm audits; Gitleaks; recursive OSV scanning; release-package integrity; and the Flutter payroll callable SDK integration on an Android Emulator using synthetic data and a temporary payroll-only test rules fixture. The newly added Manager-menu assertion still needs a fresh four-role simulator run.
+The public GitHub Actions workflow is organised as nine independent checks: Flutter formatting/analysis/unit tests; Cloud Functions lint and tests; npm dependency audits; full-history Gitleaks; recursive OSV scanning; release-package integrity; payroll callable SDK integration; four-role screenshot capture; and the complete four-role application acceptance journey on an Android Emulator. The two Android dashboard jobs use a synthetic demo Firebase project and isolated Auth/Firestore Emulators; they do not access production Firebase. See the live [GitHub Actions status](https://github.com/Ryian-1/MohallaFlow/actions) for the latest run result.
 
 The Android release APK generated during verification was approximately 69.7 MB. The unsigned iOS device application build was approximately 57.6 MB.
 
@@ -261,7 +261,7 @@ iOS App Store distribution requires a separate Apple Developer signing and relea
 
 ## App screenshots
 
-These are genuine captures of the running Flutter application, taken from authenticated Admin, Resident, Cleanliness Manager and Worker sessions against the isolated `demo-mohallaflow` Firebase Emulator project. The fixture uses synthetic account names and masked contact values; no production resident data is used.
+These are genuine captures of the running Flutter application, taken from authenticated Admin, Resident, Cleanliness Manager and Worker sessions against the isolated `demo-mohallaflow` Firebase Emulator project. The fixture uses fictional role names and the deliberately invalid placeholder contact number `0000000000`; no production resident data is used.
 
 <p align="center">
   <img src="assets/screenshots/01-admin-dashboard.png" alt="MohallaFlow Admin dashboard" width="23%" />
@@ -288,9 +288,9 @@ The capture procedure and privacy controls are documented in the [screenshot cap
 - App Check enforcement must be verified in each target Firebase environment.
 - Live push notification and APNs delivery require separate environment-specific acceptance.
 - iOS distribution signing and App Store packaging remain outstanding.
-- Public GitHub Actions passed all seven jobs on 14 November 2026, including Flutter checks, Functions tests, the payroll SDK Emulator integration, npm audits, recursive OSV scan, full-history Gitleaks scan and release-package integrity. The broader Candidate G authorization suite remains maintainer-only.
+- Public CI includes a nine-job pipeline, including separate four-role screenshot capture and full Android application acceptance jobs. The broader Candidate G authorization suite remains maintainer-only.
 - Keep dependency advisory scanning and Dependabot enabled; rerun after dependency/lockfile changes.
-- Genuine release screenshots and ownership/licensing review remain outstanding.
+- Genuine four-role dashboard screenshots are included in `assets/screenshots/`. First-party ownership/licensing review remains outstanding.
 
 See the [publication checklist](docs/publication/PUBLICATION_CHECKLIST.md) for the remaining release gates.
 

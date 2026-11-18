@@ -6,20 +6,20 @@ const { getAuth } = require('firebase-admin/auth');
 
 const PROJECT_ID = 'demo-mohallaflow';
 const COLONY_ID = 'four_role_application_integration';
-const COLONY_NAME = 'MohallaFlow Integration Colony';
+const COLONY_NAME = 'Greenview Residency';
 const PASSWORD = 'MohallaFlow-Integration-2026!';
 
 const ACCOUNTS = [
   {
     key: 'admin',
     email: 'mf-four-role-admin@example.test',
-    name: 'MohallaFlow Integration Admin',
+    name: 'Colony Admin',
     role: 'admin',
   },
   {
     key: 'resident',
     email: 'mf-four-role-resident@example.test',
-    name: 'MohallaFlow Integration Resident',
+    name: 'Aarav Mehta',
     role: 'resident',
     residentId: 'resident-four-role',
     householdId: 'household-four-role',
@@ -27,13 +27,13 @@ const ACCOUNTS = [
   {
     key: 'manager',
     email: 'mf-four-role-manager@example.test',
-    name: 'MohallaFlow Integration Manager',
+    name: 'Priya Sharma',
     role: 'cleanliness_manager',
   },
   {
     key: 'worker',
     email: 'mf-four-role-worker@example.test',
-    name: 'MohallaFlow Integration Worker',
+    name: 'Ravi Kumar',
     role: 'worker',
     workerId: 'worker-four-role',
   },
@@ -208,7 +208,7 @@ async function seed() {
     await db.collection('users').doc(user.uid).set({
       displayName: account.name,
       email: account.email,
-      phoneNumber: '+910000000001',
+      phoneNumber: '+910000000000',
       status: 'active',
       colonyIds: [COLONY_ID],
       createdAt: now,
@@ -250,7 +250,7 @@ async function seed() {
       blockId: 'A',
       houseNumber: 'A-101',
       householdHeadName: ACCOUNTS[1].name,
-      primaryPhone: '+910000000002',
+      primaryPhone: '0000000000',
       occupancyStatus: 'occupied',
       createdAt: now,
       updatedAt: now,
@@ -270,7 +270,7 @@ async function seed() {
       householdId: 'household-four-role',
       blockId: 'A',
       houseNumber: 'A-101',
-      phoneNumber: '+919876543210',
+      phoneNumber: '0000000000',
       email: ACCOUNTS[1].email,
       createdAt: now,
       updatedAt: now,
@@ -280,7 +280,7 @@ async function seed() {
     .doc('worker-four-role')
     .set({
       fullName: ACCOUNTS[3].name,
-      phoneNumber: '9876543211',
+      phoneNumber: '0000000000',
       assignedArea: 'Block A',
       status: 'active',
       createdBy: admin.uid,
@@ -293,8 +293,8 @@ async function seed() {
     .doc('worker-four-role')
     .set({
       bloodGroup: 'O+',
-      familyMemberName: 'Integration Emergency Contact',
-      familyMemberPhone: '9876543212',
+      familyMemberName: 'Emergency Contact',
+      familyMemberPhone: '0000000000',
       consentStatus: 'granted',
       consentAt: now,
       privacyNoticeVersion: 'worker-private-v1',
@@ -318,8 +318,8 @@ async function seed() {
     .doc('four-role-complaint')
     .set({
       complaintId: 'four-role-complaint',
-      title: 'Integration corridor cleanliness complaint',
-      description: 'Seeded complaint for four-role dashboard testing.',
+      title: 'Litter near Block A corridor',
+      description: 'Litter needs to be cleared from the shared corridor.',
       category: 'cleanliness',
       complaintType: 'cleanliness',
       status: 'submitted',
@@ -334,9 +334,9 @@ async function seed() {
     .doc('four-role-task')
     .set({
       taskId: 'four-role-task',
-      title: 'Integration corridor cleaning task',
-      taskName: 'Integration corridor cleaning task',
-      description: 'Seeded task assigned to the integration worker.',
+      title: 'Block A corridor cleaning',
+      taskName: 'Block A corridor cleaning',
+      description: 'Routine cleaning assigned for the Block A corridor.',
       area: 'Block A',
       status: 'assigned',
       assignedWorkerId: 'worker-four-role',
@@ -352,8 +352,8 @@ async function seed() {
     .doc('four-role-housekeeping')
     .set({
       requestId: 'four-role-housekeeping',
-      title: 'Integration housekeeping request',
-      description: 'Seeded housekeeping request.',
+      title: 'Routine housekeeping request',
+      description: 'Routine housekeeping for the shared areas.',
       status: 'assigned',
       requestedBy: resident.uid,
       requestedByName: ACCOUNTS[1].name,
@@ -371,8 +371,8 @@ async function seed() {
       houseNumber: 'A-101',
       householdHeadName: ACCOUNTS[1].name,
       billingPeriod: 'November 2026',
-      title: 'Integration maintenance bill',
-      description: 'Integration-only maintenance payment verification fixture.',
+      title: 'November maintenance bill',
+      description: 'Monthly maintenance contribution for the demo community.',
       totalAmount: 2500,
       amountPaid: 500,
       status: 'partially_paid',
@@ -380,7 +380,7 @@ async function seed() {
         new Date('2026-12-01T00:00:00.000Z'),
       ),
       upiId: 'mohallaflow@bank',
-      paymentInstructions: 'Integration-only payment instructions.',
+      paymentInstructions: 'Use the demo payment flow for verification testing.',
       createdBy: admin.uid,
       createdByName: ACCOUNTS[0].name,
       createdAt: now,
@@ -391,8 +391,8 @@ async function seed() {
     .doc('four-role-maintenance')
     .set({
       jobId: 'four-role-maintenance',
-      title: 'Integration maintenance job',
-      description: 'Seeded maintenance job.',
+      title: 'Common-area maintenance request',
+      description: 'Routine maintenance request for the demo community.',
       status: 'submitted',
       createdAt: now,
       updatedAt: now,

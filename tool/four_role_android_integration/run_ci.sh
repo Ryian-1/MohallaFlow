@@ -169,12 +169,12 @@ PY
   echo "[PASS] Four authentic role dashboards captured and validated."
 elif [[ "$MOHALLAFLOW_INTEGRATION_MODE" == "acceptance" ]]; then
   echo
-  echo "========== RUN FULL FOUR-ROLE APPLICATION ACCEPTANCE =========="
-  if ! flutter drive \
-    --driver=test_driver/mohallaflow_integration_test_driver.dart \
-    --target=integration_test/four_role_application_integration_test.dart \
+  echo "========== RUN FULL FOUR-ROLE APPLICATION ACCEPTANCE (FLUTTER TEST) =========="
+  if ! flutter test \
+    integration_test/four_role_application_integration_test.dart \
     --device-id emulator-5554 \
     --no-pub \
+    --reporter expanded \
     --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2; then
     echo "[DIAGNOSTIC] Full four-role acceptance failed; capturing Android logcat." >&2
     adb logcat -d -v time -t 1600 || true
