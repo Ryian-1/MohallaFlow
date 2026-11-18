@@ -293,15 +293,18 @@ Future<void> _exerciseResidentToResolutionJourney({
   final residentFields = find.byType(TextField);
   expect(
     residentFields,
-    findsNWidgets(3),
-    reason: 'Resident complaint form should expose title, location and description.',
+    findsNWidgets(5),
+    reason:
+        'Resident complaint form should expose resident name, phone, title, location and description.',
   );
-  await tester.enterText(residentFields.at(0), complaintTitle);
+  await tester.enterText(residentFields.at(0), 'MohallaFlow Integration Resident');
+  await tester.enterText(residentFields.at(1), '9876543210');
+  await tester.enterText(residentFields.at(2), complaintTitle);
   await tester.enterText(
-    residentFields.at(1),
+    residentFields.at(3),
     'Block A, near the shared corridor',
   );
-  await tester.enterText(residentFields.at(2), complaintDescription);
+  await tester.enterText(residentFields.at(4), complaintDescription);
 
   final categoryDropdown = find.byType(DropdownButtonFormField<String>).first;
   await tester.ensureVisible(categoryDropdown);
