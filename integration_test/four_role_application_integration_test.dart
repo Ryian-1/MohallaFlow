@@ -25,6 +25,10 @@ const String firebaseEmulatorHost = String.fromEnvironment(
   'FIREBASE_EMULATOR_HOST',
   defaultValue: '127.0.0.1',
 );
+const bool captureScreenshotsOnly = bool.fromEnvironment(
+  'MOHALLAFLOW_SCREENSHOTS_ONLY',
+  defaultValue: false,
+);
 
 enum RoleCase { admin, resident, cleanlinessManager, worker }
 
@@ -188,21 +192,31 @@ void main() {
 
         // Convert once on Android, then capture the actual rendered dashboard
         // while authenticated as each synthetic role in the demo Firebase project.
-        if (!screenshotSurfaceReady) {
-          await binding.convertFlutterSurfaceToImage();
-          await tester.pump();
-          screenshotSurfaceReady = true;
+        if (captureScreenshotsOnly) {
+          if (!screenshotSurfaceReady) {
+            await binding.convertFlutterSurfaceToImage();
+            await tester.pump();
+            screenshotSurfaceReady = true;
+          }
+          final screenshotName = dashboardScreenshotNames[scenario.role];
+          if (screenshotName == null) {
+            fail('Missing publication screenshot name for ${scenario.role}.');
+          }
+          await binding.takeScreenshot(screenshotName);
         }
-        final screenshotName = dashboardScreenshotNames[scenario.role];
-        if (screenshotName == null) {
-          fail('Missing publication screenshot name for ${scenario.role}.');
-        }
-        await binding.takeScreenshot(screenshotName);
 
         // Unmount before signing out so every role's stream subscriptions are
         // disposed before the next authenticated session is created.
         await tester.pumpWidget(const SizedBox.shrink());
         await auth.signOut();
+      }
+
+      // The short screenshot-only pass ends after all four authenticated
+      // dashboards have loaded and been captured. The full acceptance pass
+      // continues through all notification, complaint, task and payment flows.
+      if (captureScreenshotsOnly) {
+        expect(auth.currentUser, isNull);
+        return;
       }
 
       // Verify worker notification fan-out is presented as one logical event.
