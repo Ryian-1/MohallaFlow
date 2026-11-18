@@ -188,12 +188,14 @@ void main() {
         expect(
           brandLogoFinder,
           findsOneWidget,
-          reason: 'The ${scenario.role.name} dashboard must display the full MohallaFlow wordmark.',
+          reason:
+              'The ${scenario.role.name} dashboard must display the full MohallaFlow wordmark.',
         );
         expect(
           tester.getSize(brandLogoFinder).width,
           greaterThanOrEqualTo(120),
-          reason: 'The ${scenario.role.name} wordmark is compressed in the AppBar.',
+          reason:
+              'The ${scenario.role.name} wordmark is compressed in the AppBar.',
         );
         expect(find.text(colonyName), findsWidgets);
         expect(
