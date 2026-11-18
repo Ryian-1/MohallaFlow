@@ -138,10 +138,16 @@ trap cleanup_fixture EXIT
 
 node functions/test/payroll-flutter-sdk.seed.js seed
 
-flutter test integration_test/payroll_callable_sdk_test.dart \
+if ! flutter drive \
+  --driver=test_driver/mohallaflow_integration_test_driver.dart \
+  --target=integration_test/payroll_callable_sdk_test.dart \
   --device-id emulator-5554 \
-  --reporter expanded \
-  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2
+  --no-pub \
+  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2; then
+  echo "[DIAGNOSTIC] Payroll SDK emulator test failed; capturing Android logcat." >&2
+  adb logcat -d -v time -t 1200 || true
+  exit 1
+fi
 COMMAND
 
 chmod +x "$COMMAND_FILE"

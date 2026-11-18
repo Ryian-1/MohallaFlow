@@ -1481,12 +1481,14 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
         backgroundColor: AppTheme.white,
         foregroundColor: AppTheme.navyBlue,
         elevation: 0,
-        title: const Column(
+        toolbarHeight: 66,
+        title: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BrandLogo(width: 140, height: 30),
-            AppText(
+            const BrandLogo(width: 140, height: 30),
+            const AppText(
               'CLEANLINESS MANAGEMENT',
               maxLines: 1,
               softWrap: false,
@@ -1496,6 +1498,17 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
                 fontSize: 8,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.8,
+              ),
+            ),
+            AppText(
+              widget.colonyName,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.textGrey,
+                fontSize: 9,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],

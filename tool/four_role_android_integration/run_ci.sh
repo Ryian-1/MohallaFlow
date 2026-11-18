@@ -152,10 +152,16 @@ PY
 
 echo
 echo "========== RUN FULL FOUR-ROLE APPLICATION ACCEPTANCE =========="
-flutter test integration_test/four_role_application_integration_test.dart \
+if ! flutter drive \
+  --driver=test_driver/mohallaflow_integration_test_driver.dart \
+  --target=integration_test/four_role_application_integration_test.dart \
   --device-id emulator-5554 \
-  --reporter expanded \
-  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2
+  --no-pub \
+  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2; then
+  echo "[DIAGNOSTIC] Full four-role acceptance failed; capturing Android logcat." >&2
+  adb logcat -d -v time -t 1600 || true
+  exit 1
+fi
 
 echo "[PASS] Full four-role UI workflow completed against the same isolated Emulator instance."
 
