@@ -1118,6 +1118,14 @@ Future<void> _waitForScreenshotReadiness(
                 .text('Integration corridor cleaning task')
                 .evaluate()
                 .isNotEmpty &&
+            find.text('Blood group: O+').evaluate().isNotEmpty &&
+            find
+                .text(
+                  'Family / emergency contact: '
+                  'Integration Emergency Contact · 9876543212',
+                )
+                .evaluate()
+                .isNotEmpty &&
             find
                 .textContaining('Loading your personal details')
                 .evaluate()
