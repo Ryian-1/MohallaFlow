@@ -297,7 +297,10 @@ Future<void> _exerciseResidentToResolutionJourney({
     reason:
         'Resident complaint form should expose resident name, phone, title, location and description.',
   );
-  await tester.enterText(residentFields.at(0), 'MohallaFlow Integration Resident');
+  await tester.enterText(
+    residentFields.at(0),
+    'MohallaFlow Integration Resident',
+  );
   await tester.enterText(residentFields.at(1), '9876543210');
   await tester.enterText(residentFields.at(2), complaintTitle);
   await tester.enterText(
