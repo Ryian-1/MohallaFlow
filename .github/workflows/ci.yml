@@ -167,6 +167,235 @@ jobs:
           emulator-boot-timeout: 900
           script: bash tool/payroll_sdk_integration/run_ci.sh
 
+
+  four-role-screenshots:
+    name: Four-role screenshot capture on Android Emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - name: Set up Java for Firebase Emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.9
+          cache: true
+      - name: Create compile-only Firebase options
+        run: cp lib/firebase_options.dart.example lib/firebase_options.dart
+      - name: Resolve Flutter packages
+        run: flutter pub get --enforce-lockfile
+      - name: Install four-role fixture dependencies
+        run: npm ci --prefix functions
+      - name: Create compile-only Android Google Services configuration
+        run: |
+          cat > android/app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "demo-mohallaflow",
+              "storage_bucket": "demo-mohallaflow.invalid"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.mohallaflow.mohalla_flow"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "A00000000000000000000000000000000000000"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          JSON
+      - name: Install pinned Firebase CLI
+        run: npm install --global firebase-tools@15.34.2
+      - name: Enable KVM for Android Emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          sudo gpasswd -a "$USER" kvm
+          sudo chmod 666 /dev/kvm
+          ls -l /dev/kvm
+          id
+      - name: Capture four genuine role dashboards with Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          disable-linux-hw-accel: false
+          emulator-boot-timeout: 900
+          script: bash tool/four_role_android_integration/run_ci.sh screenshots
+      - name: Upload genuine four-role app screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mohallaflow-genuine-app-screenshots
+          path: build/publication_screenshots/*.png
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Publish validated screenshots to the PR branch
+        if: success() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        env:
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -Eeuo pipefail
+
+          mapfile -t images < <(find build/publication_screenshots -maxdepth 1 -type f -name '*.png' -print | sort)
+          [[ "${#images[@]}" -eq 4 ]] || {
+            echo "[STOP] Expected exactly four validated screenshot PNGs; found ${#images[@]}." >&2
+            exit 1
+          }
+
+          git check-ref-format "refs/heads/$GITHUB_HEAD_REF"
+          git fetch --no-tags origin "refs/heads/$GITHUB_HEAD_REF:refs/remotes/origin/$GITHUB_HEAD_REF"
+          remote_head="$(git rev-parse "refs/remotes/origin/$GITHUB_HEAD_REF")"
+          [[ "$remote_head" == "$GITHUB_HEAD_SHA" ]] || {
+            echo "[STOP] PR branch advanced during capture; refusing to publish stale screenshots." >&2
+            exit 1
+          }
+
+          git checkout -B publish-app-screenshots "refs/remotes/origin/$GITHUB_HEAD_REF"
+          mkdir -p assets/screenshots
+          cp "${images[@]}" assets/screenshots/
+          cat > assets/screenshots/README.md <<'SCREENSHOTS'
+          # MohallaFlow app screenshots
+
+          These are genuine captures of the running Flutter application from authenticated Admin, Resident, Cleanliness Manager and Worker sessions against the isolated demo-mohallaflow Firebase Emulator project.
+
+          The fixture uses synthetic identities and clearly invalid masked contact values. No production Firebase data is used.
+          SCREENSHOTS
+
+          git add assets/screenshots
+          if git diff --cached --quiet; then
+            echo "[INFO] No screenshot changes to publish."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: add genuine MohallaFlow app screenshots"
+          git push origin "HEAD:refs/heads/$GITHUB_HEAD_REF"
+
+
+  four-role-acceptance:
+    name: Four-role application acceptance on Android Emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - name: Set up Java for Firebase Emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.9
+          cache: true
+      - name: Create compile-only Firebase options
+        run: cp lib/firebase_options.dart.example lib/firebase_options.dart
+      - name: Resolve Flutter packages
+        run: flutter pub get --enforce-lockfile
+      - name: Install four-role fixture dependencies
+        run: npm ci --prefix functions
+      - name: Create compile-only Android Google Services configuration
+        run: |
+          cat > android/app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "demo-mohallaflow",
+              "storage_bucket": "demo-mohallaflow.invalid"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.mohallaflow.mohalla_flow"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "A00000000000000000000000000000000000000"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          JSON
+      - name: Install pinned Firebase CLI
+        run: npm install --global firebase-tools@15.34.2
+      - name: Enable KVM for Android Emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          sudo gpasswd -a "$USER" kvm
+          sudo chmod 666 /dev/kvm
+          ls -l /dev/kvm
+          id
+      - name: Run full four-role application acceptance
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          disable-linux-hw-accel: false
+          emulator-boot-timeout: 900
+          script: bash tool/four_role_android_integration/run_ci.sh acceptance
+
+
   functions:
     name: Cloud Functions lint and unit tests
     runs-on: ubuntu-latest
@@ -222,6 +451,8 @@ jobs:
           python3 -m py_compile firestore/scripts/verify_rules_release.py
           bash -n firestore/scripts/deploy-firestore.sh
           bash -n firestore/scripts/deploy-functions.sh
+          bash -n ../tool/four_role_android_integration/run_ci.sh
+          bash -n ../tool/four_role_android_integration/run_acceptance_ci.sh
           python3 firestore/scripts/production_preflight.py --help >/dev/null
           python3 firestore/scripts/wait_for_indexes.py --help >/dev/null
           python3 firestore/scripts/verify_rules_release.py --help >/dev/null

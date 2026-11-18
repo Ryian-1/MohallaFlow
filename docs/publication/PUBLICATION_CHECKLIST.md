@@ -1,7 +1,7 @@
 # MohallaFlow — Public Snapshot and Release Checklist
 
-**Review date:** 13 November 2026  
-**Publication status:** Public code-showcase snapshot published; **not production-ready**.
+**Review date:** 18 November 2026  
+**Publication status:** Public code-showcase snapshot and genuine four-role screenshot gallery published; **not a production or store release**.
 
 This document distinguishes the published source snapshot, locally completed engineering evidence, public CI, and the separate requirements for a production colony deployment. Emulator test success is not production approval. An unsigned iOS build is not App Store distribution readiness.
 
@@ -40,34 +40,37 @@ These are recorded local results from the remediation workspace. They are not a 
 
 ## 3. Public GitHub Actions
 
-The first workflow run on the publication commit exposed an incorrect CI boundary:
+The public workflow separates dashboard screenshot capture from full application acceptance so each Android Emulator job starts with a clean app and Emulator lifecycle.
 
-- [x] Flutter formatting, static analysis and unit/widget tests passed on GitHub Actions.
-- [x] Cloud Functions lint and Node.js unit tests passed on GitHub Actions.
-- [x] The original Functions job failed only at its subsequent Emulator step because its runner requires the deliberately excluded private Candidate G rules file.
-- [x] The original Firestore job failed because the private Candidate G rules file is deliberately absent from the public repository.
-- [x] Public CI workflow corrected to run checks that can execute from the public snapshot without private security rules or production Firebase configuration.
-- [x] All seven public GitHub Actions jobs passed on 14 November 2026, run [43553930997](https://github.com/Ryian-1/MohallaFlow/actions/runs/43553930997), release-branch head `d65d579bf190bb7e2da05ebf6ff2dc6d296153e1`.
-- [x] Flutter format, static analysis, unit/widget tests, Cloud Functions lint/unit tests, npm audits, recursive OSV scan and full-history Gitleaks scan passed.
-- [x] Flutter payroll callable SDK integration passed on an Android Emulator against Auth, Firestore and Functions Emulators using synthetic data.
-- [x] GitHub Actions updated to `actions/checkout@v7` and `actions/setup-node@v7`; the seven-job run above passed with these versions.
-- [x] A payroll-only test rules fixture is generated temporarily inside the CI runner and removed at job exit. It is not Candidate G and is not a production ruleset.
+The nine jobs are:
 
-The public workflow covers Flutter format, analysis and unit/widget tests; Cloud Functions lint/unit tests; dependency audits; full-history secret scanning; recursive OSV scanning; release-package integrity; and the payroll Flutter SDK Emulator integration. The exact release Rules candidate is present under `release/firestore/`; its six-suite, 122-test authorization result was produced in private Emulator CI. Other private QA fixtures and production runtime configuration remain excluded. Do not add live production credentials or resident data to the public repository.
+1. Flutter format, static analysis, unit and widget tests.
+2. Cloud Functions lint and unit tests, including isolated payroll backend tests.
+3. npm dependency audits for both lockfiles.
+4. Full-history Gitleaks secret scanning.
+5. Recursive OSV dependency vulnerability scanning.
+6. Production release package integrity and deployment-script syntax.
+7. Flutter payroll callable SDK integration on an Android Emulator.
+8. Genuine Admin, Resident, Cleanliness Manager and Worker screenshot capture on an Android Emulator.
+9. Full four-role application acceptance on a separate Android Emulator, including the resident complaint → Manager assignment → Worker completion journey, notification deduplication and maintenance payment verification.
 
-[View GitHub Actions](https://github.com/Ryian-1/MohallaFlow/actions)
+The Emulator jobs use fictional role names, deliberately invalid placeholder phone values, the `demo-mohallaflow` project and isolated Auth/Firestore Emulators. The screenshots are uploaded as a workflow artifact and validated copies are published to the PR branch. Production Firebase is not accessed.
 
-## 4. Checks still requiring fresh evidence
+The exact release Rules candidate remains under `release/firestore/`; its six-suite, 122-test authorization result was produced in private Emulator CI. Other private QA fixtures and production runtime configuration remain excluded. Do not add live production credentials or resident data to the public repository.
 
-- [x] Online `npm audit --audit-level=moderate` passed for `functions/package-lock.json` and `firestore-rules-tests/package-lock.json` in public GitHub Actions run [43553930997](https://github.com/Ryian-1/MohallaFlow/actions/runs/43553930997), 14 November 2026. No moderate-or-higher npm advisories were reported at scan time.
-- [x] Recursive OSV-Scanner completed successfully against supported dependency manifests/lockfiles in the same run; no findings were reported at scan time.
-- [x] Gitleaks completed successfully against the full public Git history in the same run. This scan does not replace triage of any separate GitHub Secret Scanning alert.
-- [x] Flutter payroll callable SDK integration passed on an Android Emulator with local Auth, Firestore and Functions Emulators, using synthetic test data and a temporary payroll-only rules fixture.
-- [x] A fresh GitHub-hosted checkout completed all seven CI jobs, including Flutter, Functions, security scans, release integrity and payroll SDK emulator integration.
+[View GitHub Actions](https://github.com/Ryian-1/MohallaFlow)
+
+## 4. Current CI evidence
+
+- [x] npm dependency audits have passed in public GitHub Actions.
+- [x] Recursive OSV-Scanner has completed successfully; rerun after dependency changes.
+- [x] Gitleaks has completed successfully against the full public Git history.
+- [x] Flutter payroll callable SDK integration has passed on an Android Emulator using isolated Auth/Firestore/Functions Emulators and synthetic data.
+- [x] Four-role screenshot capture has passed on an Android Emulator; four genuine dashboard PNGs are included under `assets/screenshots/`.
+- [ ] The full four-role application acceptance job must pass on the current PR head; a screenshot-only pass is not a substitute.
 - [ ] Independently verify the contributor setup instructions on a separate maintainer-controlled Mac/Windows environment.
-- [ ] Re-run the broader four-role UI/integration acceptance suite after any application-source changes.
 
-The successful GitHub Actions run is fresh evidence for the checks listed above. It does not establish production Firebase acceptance or replace the broader private Candidate G authorization test suite.
+Live run status is authoritative at [GitHub Actions](https://github.com/Ryian-1/MohallaFlow/actions). CI success does not establish production Firebase acceptance or replace the broader private Candidate G authorization test suite.
 
 ## 5. Production and deployment blockers — keep unchecked
 
@@ -90,7 +93,7 @@ The successful GitHub Actions run is fresh evidence for the checks listed above.
 - [ ] Confirm rights to logos, fonts, icons, screenshots and other visual assets.
 - [x] Generate documented third-party dependency licence inventories. Four Flutter engine artifacts and two reconstructed Node MIT notices retain explicit source-provenance caveats; the inventory is not legal clearance.
 - [x] Keep the repository unlicensed / all rights reserved for this public showcase; no open-source licence is granted. Revisit only after ownership and redistribution rights are confirmed.
-- [ ] Capture genuine, sanitised screenshots from the current application using synthetic demo data for all four roles and key workflows.
+- [x] Capture genuine, sanitised Admin, Resident, Cleanliness Manager and Worker dashboard screenshots from the current application using fictional demo identities; originals are published under `assets/screenshots/`.
 - [x] README, architecture, data-model, Firebase setup, security and troubleshooting pages are present and their public CI/setup relationship is documented. Final human acceptance review remains advisable.
 - [ ] Prepare release notes and select a version only after the included snapshot is frozen.
 - [ ] Decide whether to make a separate public release announcement after the review gates are cleared.
@@ -99,8 +102,8 @@ No open-source licence is currently granted in this repository. Public visibilit
 
 ## 7. Release decision
 
-**Current decision: PUBLIC CODE SHOWCASE PUBLISHED; SEVEN-JOB PUBLIC CI AND PAYROLL SDK EMULATOR INTEGRATION PASS; NOT READY FOR PRODUCTION DEPLOYMENT OR STORE RELEASE.**
+**Current decision: PUBLIC CODE SHOWCASE AND FOUR-ROLE SCREENSHOT GALLERY PUBLISHED; PORTFOLIO PRESENTATION IS SEPARATE FROM PRODUCTION DEPLOYMENT OR STORE RELEASE.**
 
-The repository is public and the initial snapshot has an independent clean history. The release branch contains the SHA-pinned Firestore deployment candidate, but production Rules/indexes and Functions remain undeployed. Seven public CI jobs pass on a fresh GitHub checkout, including Flutter checks, Functions checks, npm audits, recursive OSV, full-history Gitleaks, release package integrity and payroll SDK Emulator integration. The broader Firestore authorization evidence remains in private Emulator CI.
+The repository is public, the initial publication history is independent, and the genuine four-role dashboard screenshot gallery is included in the repository. The release branch contains the SHA-pinned Firestore deployment candidate, but production Rules/indexes and Functions remain undeployed. The public CI pipeline covers Flutter, Functions, dependency/security scans, release integrity, payroll SDK integration, screenshot capture and full four-role Android acceptance. The broader Firestore authorization evidence remains in private Emulator CI.
 
-Production legacy-client compatibility, Firestore deployment and verification, Functions deployment, App Check configuration acceptance, signed Android/iOS distribution, legal/ownership approval, authentic screenshots and a fresh four-role simulator test for the new Manager-menu assertion remain open gates. The public payroll SDK Emulator integration is complete.
+Production legacy-client compatibility, Firestore deployment and verification, Functions deployment, App Check configuration acceptance, signed Android/iOS distribution and legal/ownership approval remain open gates. This repository is suitable as a portfolio code showcase only after the current CI acceptance job is green; it must not be described as a production colony deployment or store release.

@@ -22,6 +22,15 @@ Only genuine screenshots captured from the current running application may be pr
 - Capture the actual app at a consistent resolution and retain original captures separately from edited/redacted public copies.
 - Obtain maintainer approval before adding captures to the repository.
 
-## Current status
+## Automated capture and publication
 
-No screenshots were present in the audited source archive. Screenshots are therefore pending and intentionally not fabricated by this package.
+The public GitHub Actions four-role Android Emulator job now captures four dashboard PNGs from the running Flutter application using authenticated synthetic accounts:
+
+- `assets/screenshots/01-admin-dashboard.png`
+- `assets/screenshots/02-resident-dashboard.png`
+- `assets/screenshots/03-cleanliness-manager-dashboard.png`
+- `assets/screenshots/04-worker-dashboard.png`
+
+The capture pass checks that all four files exist, have a valid PNG signature, and meet minimum dimensions before they are published. The fixture uses the isolated `demo-mohallaflow` Auth and Firestore Emulators. Clearly invalid/masked contact values are used in the synthetic resident and worker records. Production Firebase is not accessed.
+
+The capture step uploads an Actions artifact and publishes the validated copies into the PR branch. A separate emulator pass then runs the complete four-role acceptance suite. No mockups or generated screen illustrations are used as product screenshots.

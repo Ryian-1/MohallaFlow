@@ -1481,51 +1481,45 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
         backgroundColor: AppTheme.white,
         foregroundColor: AppTheme.navyBlue,
         elevation: 0,
-        title: Row(
+        toolbarHeight: 66,
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const BrandMonogram(width: 30, height: 22),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const AppText(
-                    'Cleanliness Management',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                  ),
-                  AppText(
-                    widget.colonyName,
-                    style: const TextStyle(
-                      color: AppTheme.textGrey,
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
+            const BrandLogo(width: 140, height: 30),
+            const AppText(
+              'CLEANLINESS MANAGEMENT',
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: AppTheme.textGrey,
+                fontSize: 8,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.8,
+              ),
+            ),
+            AppText(
+              widget.colonyName,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.textGrey,
+                fontSize: 9,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
+        titleSpacing: 12,
         actions: [
           const AppLanguageToggle(),
           ColonySwitchAction(
             currentColonyId: widget.colonyId,
             currentColonyName: widget.colonyName,
             currentRole: widget.currentRole,
-          ),
-          IconButton(
-            tooltip: AppTranslations.translate('Worker attendance'),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => WorkerAttendanceScreen(
-                    colonyId: widget.colonyId,
-                    colonyName: widget.colonyName,
-                    isManager: true,
-                  ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.fact_check_outlined),
           ),
           NotificationBell(
             colonyId: widget.colonyId,
@@ -1534,36 +1528,74 @@ class _CleanlinessScreenState extends State<CleanlinessScreen> {
                 ? 'admin'
                 : 'cleanliness_manager',
           ),
-          IconButton(
-            tooltip: AppTranslations.translate('Shared colony documents'),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => DocumentRepositoryScreen(
-                  colonyId: widget.colonyId,
-                  colonyName: widget.colonyName,
-                  isAdmin: widget.currentRole == UserRole.admin,
-                  roleKey: widget.currentRole == UserRole.admin
-                      ? 'admin'
-                      : 'cleanliness_manager',
-                  adminName: widget.adminName,
+          PopupMenuButton<String>(
+            tooltip: AppTranslations.translate('More actions'),
+            onSelected: (action) {
+              switch (action) {
+                case 'attendance':
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => WorkerAttendanceScreen(
+                        colonyId: widget.colonyId,
+                        colonyName: widget.colonyName,
+                        isManager: true,
+                      ),
+                    ),
+                  );
+                  break;
+                case 'documents':
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => DocumentRepositoryScreen(
+                        colonyId: widget.colonyId,
+                        colonyName: widget.colonyName,
+                        isAdmin: widget.currentRole == UserRole.admin,
+                        roleKey: widget.currentRole == UserRole.admin
+                            ? 'admin'
+                            : 'cleanliness_manager',
+                        adminName: widget.adminName,
+                      ),
+                    ),
+                  );
+                  break;
+                case 'sign_out':
+                  if (!_isSigningOut) _signOut();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: 'attendance',
+                child: Row(
+                  children: [
+                    const Icon(Icons.fact_check_outlined),
+                    const SizedBox(width: 12),
+                    Text(AppTranslations.translate('Worker attendance')),
+                  ],
                 ),
               ),
-            ),
-            icon: const Icon(
-              Icons.folder_shared_outlined,
-              color: AppTheme.navyBlue,
-            ),
-          ),
-          IconButton(
-            tooltip: AppTranslations.translate('Sign out'),
-            onPressed: _isSigningOut ? null : _signOut,
-            icon: _isSigningOut
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.logout_rounded, color: AppTheme.navyBlue),
+              PopupMenuItem<String>(
+                value: 'documents',
+                child: Row(
+                  children: [
+                    const Icon(Icons.folder_shared_outlined),
+                    const SizedBox(width: 12),
+                    Text(AppTranslations.translate('Shared colony documents')),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'sign_out',
+                enabled: !_isSigningOut,
+                child: Row(
+                  children: [
+                    const Icon(Icons.logout_rounded),
+                    const SizedBox(width: 12),
+                    Text(AppTranslations.translate('Sign out')),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: 8),
         ],

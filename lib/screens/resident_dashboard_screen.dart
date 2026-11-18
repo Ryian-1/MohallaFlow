@@ -364,6 +364,14 @@ class _ResidentDashboardScreenState extends State<ResidentDashboardScreen> {
     if (phone.length > 10) {
       phone = phone.substring(phone.length - 10);
     }
+    // Legacy/imported profiles may contain masked or malformed phone values.
+    // The complaint Rules permit an empty reporter phone; never submit an
+    // invalid value that would reject the resident's complaint.
+    if (phone.isNotEmpty &&
+        (phone.length != 10 ||
+            !RegExp(r'^[6-9][0-9]{9}').hasMatch(phone))) {
+      phone = '';
+    }
 
     final block = residentData['blockId'] as String? ?? '';
     final house = residentData['houseNumber'] as String? ?? '';
@@ -2051,20 +2059,8 @@ class _ResidentDashboardScreenState extends State<ResidentDashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const BrandLogo(width: 140, height: 31),
-            AppText(
-              widget.colonyName,
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: AppTheme.textGrey, fontSize: 10),
-            ),
-          ],
-        ),
+        title: const BrandLogo(width: 132, height: 30),
+        titleSpacing: 12,
         actions: [
           const AppLanguageToggle(),
           ColonySwitchAction(
@@ -2078,25 +2074,45 @@ class _ResidentDashboardScreenState extends State<ResidentDashboardScreen> {
             roleKey: 'resident',
           ),
           IconButton(
-            tooltip: AppTranslations.translate('Manage visitors'),
-            onPressed: _openVisitorManagement,
-            icon: const Icon(Icons.directions_walk_outlined),
-          ),
-          IconButton(
             tooltip: AppTranslations.translate('Submit complaint'),
             onPressed: _showComplaintDialog,
             icon: const Icon(Icons.add_comment_outlined),
           ),
-          IconButton(
-            tooltip: AppTranslations.translate('Sign out'),
-            onPressed: _signingOut ? null : _signOut,
-            icon: _signingOut
-                ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.logout_rounded),
+          PopupMenuButton<String>(
+            tooltip: AppTranslations.translate('More actions'),
+            onSelected: (action) {
+              switch (action) {
+                case 'visitors':
+                  _openVisitorManagement();
+                  break;
+                case 'sign_out':
+                  if (!_signingOut) _signOut();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: 'visitors',
+                child: Row(
+                  children: [
+                    const Icon(Icons.directions_walk_outlined),
+                    const SizedBox(width: 12),
+                    Text(AppTranslations.translate('Manage visitors')),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'sign_out',
+                enabled: !_signingOut,
+                child: Row(
+                  children: [
+                    const Icon(Icons.logout_rounded),
+                    const SizedBox(width: 12),
+                    Text(AppTranslations.translate('Sign out')),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

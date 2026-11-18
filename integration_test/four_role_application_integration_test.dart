@@ -13,10 +13,11 @@ import 'package:mohalla_flow/screens/resident_dashboard_screen.dart';
 import 'package:mohalla_flow/screens/worker_dashboard_screen.dart';
 import 'package:mohalla_flow/screens/notification_center_screen.dart';
 import 'package:mohalla_flow/widgets/notification_bell.dart';
+import 'package:mohalla_flow/widgets/brand_logo.dart';
 
 const String projectId = 'demo-mohallaflow';
 const String colonyId = 'four_role_application_integration';
-const String colonyName = 'MohallaFlow Integration Colony';
+const String colonyName = 'Greenview Residency';
 const String password = 'MohallaFlow-Integration-2026!';
 const String householdId = 'household-four-role';
 const String residentId = 'resident-four-role';
@@ -24,6 +25,14 @@ const String workerId = 'worker-four-role';
 const String firebaseEmulatorHost = String.fromEnvironment(
   'FIREBASE_EMULATOR_HOST',
   defaultValue: '127.0.0.1',
+);
+const bool capturePublicationScreenshots = bool.fromEnvironment(
+  'MOHALLAFLOW_CAPTURE_PUBLICATION_SCREENSHOTS',
+  defaultValue: false,
+);
+const bool publicationScreenshotsOnly = bool.fromEnvironment(
+  'MOHALLAFLOW_SCREENSHOTS_ONLY',
+  defaultValue: false,
 );
 
 enum RoleCase { admin, resident, cleanlinessManager, worker }
@@ -64,7 +73,7 @@ const List<RoleScenario> scenarios = [
 ];
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
     'Authenticated sessions resolve all four roles and open their real dashboards',
@@ -108,6 +117,14 @@ void main() {
       firestore.settings = const Settings(persistenceEnabled: false);
 
       await auth.signOut();
+
+      var screenshotSurfaceReady = false;
+      const dashboardScreenshotNames = <RoleCase, String>{
+        RoleCase.admin: '01-admin-dashboard',
+        RoleCase.resident: '02-resident-dashboard',
+        RoleCase.cleanlinessManager: '03-cleanliness-manager-dashboard',
+        RoleCase.worker: '04-worker-dashboard',
+      };
 
       for (final scenario in scenarios) {
         await tester.pumpWidget(const SizedBox.shrink());
@@ -171,6 +188,19 @@ void main() {
         );
 
         expect(dashboard, findsOneWidget);
+        final brandLogoFinder = find.byType(BrandLogo);
+        expect(
+          brandLogoFinder,
+          findsOneWidget,
+          reason:
+              'The ${scenario.role.name} dashboard must display the full MohallaFlow wordmark.',
+        );
+        expect(
+          tester.getSize(brandLogoFinder).width,
+          greaterThanOrEqualTo(120),
+          reason:
+              'The ${scenario.role.name} wordmark is compressed in the AppBar.',
+        );
         expect(find.text(colonyName), findsWidgets);
         expect(
           find.textContaining('Unable to load'),
@@ -178,10 +208,32 @@ void main() {
           reason: 'A dashboard data stream failed for ${scenario.role}.',
         );
 
+        // Do not capture the dashboard until its role-specific Firestore
+        // content is actually rendered. A fixed delay alone can produce a
+        // spinner-only screenshot when an Emulator stream is still starting.
+        if (capturePublicationScreenshots) {
+          await _waitForScreenshotReadiness(tester, scenario.role);
+          if (!screenshotSurfaceReady) {
+            await binding.convertFlutterSurfaceToImage();
+            await tester.pump();
+            screenshotSurfaceReady = true;
+          }
+          final screenshotName = dashboardScreenshotNames[scenario.role];
+          if (screenshotName == null) {
+            fail('Missing publication screenshot name for ${scenario.role}.');
+          }
+          await binding.takeScreenshot(screenshotName);
+        }
+
         // Unmount before signing out so every role's stream subscriptions are
         // disposed before the next authenticated session is created.
         await tester.pumpWidget(const SizedBox.shrink());
         await auth.signOut();
+      }
+
+      if (publicationScreenshotsOnly) {
+        expect(auth.currentUser, isNull);
+        return;
       }
 
       // Verify worker notification fan-out is presented as one logical event.
@@ -290,6 +342,11 @@ Future<void> _exerciseResidentToResolutionJourney({
   expect(complaintData['complaintType'], 'cleanliness');
   expect(complaintData['status'], 'submitted');
   expect(complaintData['submittedBy'], residentUid);
+  expect(
+    complaintData['reportedByPhone'],
+    '',
+    reason: 'An invalid legacy/demo phone must be omitted from the complaint.',
+  );
 
   await _endRoleSession(tester, auth);
 
@@ -594,7 +651,7 @@ Future<void> _exerciseMaintenancePaymentJourney({
     'Resident could not open My Maintenance Bills.',
   );
 
-  final billTitle = find.text('Integration maintenance bill');
+  final billTitle = find.text('November maintenance bill');
   await _waitForCondition(
     tester,
     () => billTitle.evaluate().isNotEmpty,
@@ -1046,6 +1103,51 @@ Future<void> _signInAndOpenRoleDashboard({
 Future<void> _endRoleSession(WidgetTester tester, FirebaseAuth auth) async {
   await tester.pumpWidget(const SizedBox.shrink());
   await auth.signOut();
+  await tester.pump();
+}
+
+Future<void> _waitForScreenshotReadiness(
+  WidgetTester tester,
+  RoleCase role,
+) async {
+  bool ready() {
+    switch (role) {
+      case RoleCase.admin:
+        return find.text('Colony overview').evaluate().isNotEmpty &&
+            find.text('Management modules').evaluate().isNotEmpty;
+      case RoleCase.resident:
+        return find.text('Quick actions').evaluate().isNotEmpty &&
+            find.text('New complaint').evaluate().isNotEmpty &&
+            find.text('My complaints').evaluate().isNotEmpty;
+      case RoleCase.cleanlinessManager:
+        return find.text('CLEANLINESS MANAGEMENT').evaluate().isNotEmpty &&
+            find.text('Cleaning task register').evaluate().isNotEmpty &&
+            find.text('Block A corridor cleaning').evaluate().isNotEmpty;
+      case RoleCase.worker:
+        return find.text('My cleaning tasks').evaluate().isNotEmpty &&
+            find.text('Block A corridor cleaning').evaluate().isNotEmpty &&
+            find.text('Blood group: O+').evaluate().isNotEmpty &&
+            find
+                .text(
+                  'Family / emergency contact: '
+                  'Emergency Contact · 0000000000',
+                )
+                .evaluate()
+                .isNotEmpty &&
+            find
+                .textContaining('Loading your personal details')
+                .evaluate()
+                .isEmpty &&
+            find.text('Loading housekeeping jobs...').evaluate().isEmpty;
+    }
+  }
+
+  await _waitForCondition(
+    tester,
+    ready,
+    'The ${role.name} dashboard did not render its seeded content; refusing to capture a loading placeholder.',
+  );
+  await tester.pump(const Duration(milliseconds: 800));
   await tester.pump();
 }
 
