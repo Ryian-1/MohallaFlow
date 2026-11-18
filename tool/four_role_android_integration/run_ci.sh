@@ -107,13 +107,14 @@ echo "========== SEED FOUR SYNTHETIC ROLE ACCOUNTS =========="
 node functions/test/four-role-app.seed.js seed
 
 echo
-echo "========== RUN FOUR-ROLE ANDROID APPLICATION ACCEPTANCE + SCREEN CAPTURE =========="
+echo "========== CAPTURE FOUR GENUINE ROLE DASHBOARDS =========="
 mkdir -p build/publication_screenshots
 flutter drive \
   --driver=test_driver/four_role_screenshot_driver.dart \
   --target=integration_test/four_role_application_integration_test.dart \
   --device-id emulator-5554 \
-  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2
+  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2 \
+  --dart-define=MOHALLAFLOW_SCREENSHOTS_ONLY=true
 
 python3 - <<'PY'
 from pathlib import Path
@@ -149,7 +150,14 @@ for name in sorted(expected):
 print("[PASS] Four authentic role-dashboard screenshots captured from the running application.")
 PY
 
-echo "[PASS] Four-role UI integration completed against demo-mohallaflow."
+echo
+echo "========== RUN COMPLETE FOUR-ROLE APPLICATION ACCEPTANCE =========="
+flutter test integration_test/four_role_application_integration_test.dart \
+  --device-id emulator-5554 \
+  --reporter expanded \
+  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2
+
+echo "[PASS] Full four-role UI workflow completed against demo-mohallaflow."
 COMMAND
 
 chmod +x "$COMMAND_FILE"
