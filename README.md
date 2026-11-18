@@ -261,7 +261,7 @@ iOS App Store distribution requires a separate Apple Developer signing and relea
 
 ## App screenshots
 
-These are genuine captures of the running Flutter application, taken from authenticated Admin, Resident, Cleanliness Manager and Worker sessions against the isolated `demo-mohallaflow` Firebase Emulator project. The fixture uses fictional role names and the deliberately invalid placeholder contact number `0000000000`; no production resident data is used.
+These are genuine captures of the running Flutter application, taken from authenticated Admin, Resident, Cleanliness Manager and Worker sessions against the isolated `demo-mohallaflow` Firebase Emulator project. The fixture uses fictional role names and synthetic contact values only; malformed resident phone data is omitted from complaints, while the worker-only task fixture uses the format-valid demo value `9000000000`. No production resident data is used.
 
 <p align="center">
   <img src="assets/screenshots/01-admin-dashboard.png" alt="MohallaFlow Admin dashboard" width="23%" />

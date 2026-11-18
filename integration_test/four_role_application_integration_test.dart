@@ -342,6 +342,11 @@ Future<void> _exerciseResidentToResolutionJourney({
   expect(complaintData['complaintType'], 'cleanliness');
   expect(complaintData['status'], 'submitted');
   expect(complaintData['submittedBy'], residentUid);
+  expect(
+    complaintData['reportedByPhone'],
+    '',
+    reason: 'An invalid legacy/demo phone must be omitted from the complaint.',
+  );
 
   await _endRoleSession(tester, auth);
 

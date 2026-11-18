@@ -208,7 +208,7 @@ async function seed() {
     await db.collection('users').doc(user.uid).set({
       displayName: account.name,
       email: account.email,
-      phoneNumber: '+910000000000',
+      phoneNumber: '',
       status: 'active',
       colonyIds: [COLONY_ID],
       createdAt: now,
@@ -280,7 +280,7 @@ async function seed() {
     .doc('worker-four-role')
     .set({
       fullName: ACCOUNTS[3].name,
-      phoneNumber: '0000000000',
+      phoneNumber: '9000000000',
       assignedArea: 'Block A',
       status: 'active',
       createdBy: admin.uid,
@@ -294,7 +294,7 @@ async function seed() {
     .set({
       bloodGroup: 'O+',
       familyMemberName: 'Emergency Contact',
-      familyMemberPhone: '0000000000',
+      familyMemberPhone: '9000000000',
       consentStatus: 'granted',
       consentAt: now,
       privacyNoticeVersion: 'worker-private-v1',
