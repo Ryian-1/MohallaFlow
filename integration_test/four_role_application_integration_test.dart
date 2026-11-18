@@ -1117,16 +1117,10 @@ Future<void> _waitForScreenshotReadiness(
       case RoleCase.cleanlinessManager:
         return find.text('CLEANLINESS MANAGEMENT').evaluate().isNotEmpty &&
             find.text('Cleaning task register').evaluate().isNotEmpty &&
-            find
-                .text('Block A corridor cleaning')
-                .evaluate()
-                .isNotEmpty;
+            find.text('Block A corridor cleaning').evaluate().isNotEmpty;
       case RoleCase.worker:
         return find.text('My cleaning tasks').evaluate().isNotEmpty &&
-            find
-                .text('Block A corridor cleaning')
-                .evaluate()
-                .isNotEmpty &&
+            find.text('Block A corridor cleaning').evaluate().isNotEmpty &&
             find.text('Blood group: O+').evaluate().isNotEmpty &&
             find
                 .text(
