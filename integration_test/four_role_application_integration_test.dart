@@ -280,8 +280,7 @@ Future<void> _exerciseResidentToResolutionJourney({
   expect(
     residentFields,
     findsNWidgets(3),
-    reason:
-        'Resident complaint form should expose title, location and description.',
+    reason: 'Resident complaint form should expose title, location and description.',
   );
   await tester.enterText(residentFields.at(0), complaintTitle);
   await tester.enterText(
@@ -365,8 +364,7 @@ Future<void> _exerciseResidentToResolutionJourney({
   expect(
     createCleaningTaskButton,
     findsOneWidget,
-    reason:
-        'Task creation must be initiated from this resident complaint, not another incoming complaint.',
+    reason: 'Task creation must be initiated from this resident complaint, not another incoming complaint.',
   );
   await tester.tap(createCleaningTaskButton);
   await _waitForCondition(
@@ -1103,7 +1101,8 @@ Future<void> _waitForScreenshotReadiness(
             find.text('My complaints').evaluate().isNotEmpty;
       case RoleCase.cleanlinessManager:
         return find.text('Cleaning task register').evaluate().isNotEmpty &&
-            find.text('Integration corridor cleaning task')
+            find
+                .text('Integration corridor cleaning task')
                 .evaluate()
                 .isNotEmpty;
       case RoleCase.worker:
