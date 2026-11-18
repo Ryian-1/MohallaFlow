@@ -367,7 +367,13 @@ class _ResidentDashboardScreenState extends State<ResidentDashboardScreen> {
     // Legacy/imported profiles may contain masked or malformed phone values.
     // The complaint Rules permit an empty reporter phone; never submit an
     // invalid value that would reject the resident's complaint.
-    if (phone.isNotEmpty && !RegExp(r'^[6-9][0-9]{9}
+    if (phone.isNotEmpty &&
+        (phone.length != 10 ||
+            !RegExp(r'^[6-9][0-9]{9}').hasMatch(phone))) {
+      phone = '';
+    }
+
+    //
     final house = residentData['houseNumber'] as String? ?? '';
 
     final titleController = TextEditingController();
