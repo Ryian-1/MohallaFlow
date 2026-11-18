@@ -373,7 +373,6 @@ class _ResidentDashboardScreenState extends State<ResidentDashboardScreen> {
       phone = '';
     }
 
-    //
     final house = residentData['houseNumber'] as String? ?? '';
 
     final titleController = TextEditingController();
