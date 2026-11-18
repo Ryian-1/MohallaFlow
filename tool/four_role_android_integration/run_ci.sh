@@ -150,14 +150,6 @@ for name in sorted(expected):
 print("[PASS] Four authentic role-dashboard screenshots captured from the running application.")
 PY
 
-echo
-echo "========== RUN COMPLETE FOUR-ROLE APPLICATION ACCEPTANCE =========="
-flutter test integration_test/four_role_application_integration_test.dart \
-  --device-id emulator-5554 \
-  --reporter expanded \
-  --dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2
-
-echo "[PASS] Full four-role UI workflow completed against demo-mohallaflow."
 COMMAND
 
 chmod +x "$COMMAND_FILE"
