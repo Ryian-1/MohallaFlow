@@ -13,6 +13,7 @@ import 'package:mohalla_flow/screens/resident_dashboard_screen.dart';
 import 'package:mohalla_flow/screens/worker_dashboard_screen.dart';
 import 'package:mohalla_flow/screens/notification_center_screen.dart';
 import 'package:mohalla_flow/widgets/notification_bell.dart';
+import 'package:mohalla_flow/widgets/brand_logo.dart';
 
 const String projectId = 'demo-mohallaflow';
 const String colonyId = 'four_role_application_integration';
@@ -183,6 +184,17 @@ void main() {
         );
 
         expect(dashboard, findsOneWidget);
+        final brandLogoFinder = find.byType(BrandLogo);
+        expect(
+          brandLogoFinder,
+          findsOneWidget,
+          reason: 'The ${scenario.role.name} dashboard must display the full MohallaFlow wordmark.',
+        );
+        expect(
+          tester.getSize(brandLogoFinder).width,
+          greaterThanOrEqualTo(120),
+          reason: 'The ${scenario.role.name} wordmark is compressed in the AppBar.',
+        );
         expect(find.text(colonyName), findsWidgets);
         expect(
           find.textContaining('Unable to load'),
@@ -1100,7 +1112,8 @@ Future<void> _waitForScreenshotReadiness(
             find.text('New complaint').evaluate().isNotEmpty &&
             find.text('My complaints').evaluate().isNotEmpty;
       case RoleCase.cleanlinessManager:
-        return find.text('Cleaning task register').evaluate().isNotEmpty &&
+        return find.text('CLEANLINESS MANAGEMENT').evaluate().isNotEmpty &&
+            find.text('Cleaning task register').evaluate().isNotEmpty &&
             find
                 .text('Integration corridor cleaning task')
                 .evaluate()
