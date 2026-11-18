@@ -26,8 +26,8 @@ const String firebaseEmulatorHost = String.fromEnvironment(
   'FIREBASE_EMULATOR_HOST',
   defaultValue: '127.0.0.1',
 );
-const bool captureScreenshotsOnly = bool.fromEnvironment(
-  'MOHALLAFLOW_SCREENSHOTS_ONLY',
+const bool capturePublicationScreenshots = bool.fromEnvironment(
+  'MOHALLAFLOW_CAPTURE_PUBLICATION_SCREENSHOTS',
   defaultValue: false,
 );
 
@@ -207,7 +207,7 @@ void main() {
         // Do not capture the dashboard until its role-specific Firestore
         // content is actually rendered. A fixed delay alone can produce a
         // spinner-only screenshot when an Emulator stream is still starting.
-        if (captureScreenshotsOnly) {
+        if (capturePublicationScreenshots) {
           await _waitForScreenshotReadiness(tester, scenario.role);
           if (!screenshotSurfaceReady) {
             await binding.convertFlutterSurfaceToImage();
@@ -225,14 +225,6 @@ void main() {
         // disposed before the next authenticated session is created.
         await tester.pumpWidget(const SizedBox.shrink());
         await auth.signOut();
-      }
-
-      // The short screenshot-only pass ends after all four authenticated
-      // dashboards have loaded and been captured. The full acceptance pass
-      // continues through all notification, complaint, task and payment flows.
-      if (captureScreenshotsOnly) {
-        expect(auth.currentUser, isNull);
-        return;
       }
 
       // Verify worker notification fan-out is presented as one logical event.
